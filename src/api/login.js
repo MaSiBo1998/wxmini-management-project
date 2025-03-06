@@ -2,11 +2,11 @@ import { request1 } from '@/utils/request'
 // import objKeySort from './config'
 // import qs from 'qs'
 
-export function login(username, password) {
+export function login(loginAccount, loginPassword) {
   return request1({
-    url: '/toLogin',
+    url: '/admin/user/login',
     method: 'post',
-    data: { username, password }
+    data: { loginAccount, loginPassword,loginType: 2, }
   })
 }
 

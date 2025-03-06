@@ -10,7 +10,7 @@ router.beforeEach((to, from, next) => {
   // + ' - ' + Config.title
 
   NProgress.start()
-  if (!getToken()) {
+  if (getToken()) {
     // 已登录且要跳转的页面是登录页
     next()
     NProgress.done()

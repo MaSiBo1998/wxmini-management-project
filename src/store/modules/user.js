@@ -21,7 +21,7 @@ const user = {
     SET_ROLES: (state, roles) => {
       state.roles = roles
     },
-    SET_LOAD_MENUS: (state, loadMenus) => {
+    SET_LOAD_MENUS: (state,loadMenus) => {
       state.loadMenus = loadMenus
     }
   },
@@ -31,12 +31,15 @@ const user = {
     Login({ commit }, userInfo) {
       const rememberMe = false
       return new Promise((resolve, reject) => {
-        login(userInfo.username, userInfo.password).then(res => {
+        console.log(userInfo)
+        login(userInfo.loginAccount, userInfo.loginPassword).then(res => {
+          console.log(res)
           setToken(res.data.data.token, rememberMe)
           commit('SET_TOKEN', res.data.data.token)
           commit('SET_USER', res.data.data)
           resolve()
         }).catch(error => {
+
           reject(error)
         })
       })

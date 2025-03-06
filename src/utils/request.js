@@ -3,7 +3,7 @@ import objKeySort from '../api/config'
 import { Notification } from 'element-ui'
 import qs from 'qs'
 // export const root1 = 'http://bi.szzptech.cn'
-export const root1 = 'http://bisystem.rapipeso.mx'
+export const root1 = 'http://xcxapi.yiwaixiao.net'
 import store from '../store'
 import { getToken } from '@/utils/auth'
 export function request({ method, url, data, resType }) {
@@ -25,6 +25,7 @@ export function request1({ method, url, data, resType }) {
     method: method,
     baseURL: root1,
     headers: {
+      'content-type': 'application/json;',
       'token': getToken()
     },
     url: url,

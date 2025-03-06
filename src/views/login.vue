@@ -7,13 +7,13 @@
           <h3 class="title">
             后台管理
           </h3>
-          <el-form-item prop="username">
-            <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="用户姓名" prefix-icon="el-icon-user">
+          <el-form-item prop="loginAccount">
+            <el-input v-model="loginForm.loginAccount" type="text" auto-complete="off" placeholder="用户姓名" prefix-icon="el-icon-user">
 
             </el-input>
           </el-form-item>
-          <el-form-item prop="password">
-            <el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="登录密码"
+          <el-form-item prop="loginPassword">
+            <el-input v-model="loginForm.loginPassword" type="loginPassword" auto-complete="off" placeholder="登录密码"
               @keyup.enter.native="handleLogin" prefix-icon="el-icon-lock">
             </el-input>
           </el-form-item>
@@ -44,12 +44,12 @@ export default {
       codeUrl: '',
       cookiePass: '',
       loginForm: {
-        username: '',
-        password: ''
+        loginAccount: '',
+        loginPassword: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', message: '用户名不能为空' }],
-        password: [{ required: true, trigger: 'blur', message: '密码不能为空' }]
+        loginAccount: [{ required: true, trigger: 'blur', message: '用户名不能为空' }],
+        loginPassword: [{ required: true, trigger: 'blur', message: '密码不能为空' }]
       },
       loading: false,
       redirect: undefined,
@@ -68,27 +68,30 @@ export default {
   },
   methods: {
     getCookie() {
-      const username = Cookies.get('username')
-      let password = Cookies.get('password')
-      this.cookiePass = password === undefined ? '' : password
-      password = password === undefined ? this.loginForm.password : password
+      const loginAccount = Cookies.get('loginAccount')
+      let loginPassword = Cookies.get('loginPassword')
+      this.cookiePass = loginPassword === undefined ? '' : loginPassword
+      loginPassword = loginPassword === undefined ? this.loginForm.loginPassword : loginPassword
       this.loginForm = {
-        username: username === undefined ? this.loginForm.username : username,
-        password: password
+        loginAccount: loginAccount === undefined ? this.loginForm.loginAccount : loginAccount,
+        loginPassword: loginPassword
       }
     },
     handleLogin() {
+console.log('登录')
       this.$refs.loginForm.validate(valid => {
         const user = {
-          username: this.loginForm.username,
-          password: this.loginForm.password
+          loginAccount: this.loginForm.loginAccount,
+          loginPassword: this.loginForm.loginPassword
         }
         if (valid) {
+      console.log('登录1')
           this.loading = true
           this.$store.dispatch('Login', user).then((res) => {
             this.loading = false
             this.$router.push({ path: '/' })
-          }).catch(() => {
+          }).catch((err) => {
+            console.log(err)
             this.loading = false
           })
         } else {
