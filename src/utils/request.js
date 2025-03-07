@@ -29,7 +29,7 @@ export function request1({ method, url, data, resType }) {
       'token': getToken()
     },
     url: url,
-    data: method === 'post' ? qs.stringify(objKeySort(data)) : null,
+    data: method === 'post' ? data : null,
     params: method === 'get' ? objKeySort(data) : null,
     responseType: resType === 'blob' ? 'blob' : 'json'
   })
@@ -38,6 +38,7 @@ axios.interceptors.response.use(
   response => {
     // 接口请求路径
     // const url = response.config.url
+    console.log(response)
     const code = response.status
     if (response.config.responseType == 'blob') {
       return response
@@ -62,7 +63,7 @@ axios.interceptors.response.use(
         }
       }
       return Promise.reject('error')
-    } else if (!response.data.flag) {
+    } else if (response.data.code != 0) {
       if (response.data.msg == 'No Login') {
         return Promise.reject('error')
       } else {

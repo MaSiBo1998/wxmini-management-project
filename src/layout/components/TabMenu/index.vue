@@ -8,7 +8,7 @@
           <span>演员管理</span>
         </template>
       </el-menu-item>
-      <el-menu-item index="/home">
+      <el-menu-item index="/active">
         <template slot="title">
           <i class="el-icon-s-platform"></i>
           <span>招募管理</span>

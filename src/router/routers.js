@@ -39,6 +39,12 @@ export const constantRouterMap = [
         component: (resolve) => require(['@/views/actor/index'], resolve),
         hidden: true
       },
+      {
+        path: '/active',
+        name: 'actor',
+        component: (resolve) => require(['@/views/active/index'], resolve),
+        hidden: true
+      },
       // 首贷确认报表
       {
         path: '/firstLoanConfirm',
