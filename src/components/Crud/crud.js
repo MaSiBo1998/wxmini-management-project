@@ -35,17 +35,17 @@ function CRUD(options) {
     // Form 表单
     form: {},
     // 重置表单
-    defaultForm: () => {},
+    defaultForm: () => { },
     // 排序规则，默认 id 降序， 支持多字段排序 ['id,desc', 'createTime,asc']
     sort: ['id,desc'],
     // 等待时间
     time: 50,
     // CRUD Method
     crudMethod: {
-      add: (form) => {},
-      del: (id) => {},
-      edit: (form) => {},
-      get: (id) => {}
+      add: (form) => { },
+      del: (id) => { },
+      edit: (form) => { },
+      get: (id) => { }
     },
     // 主页操作栏显示哪些按钮
     optShow: {
@@ -145,9 +145,9 @@ function CRUD(options) {
             table.store.states.treeData = {}
             table.store.states.lazyTreeNodeMap = {}
           }
-          crud.data = data.data.data.dataList
-          crud.page.total = data.data.data.allNum
-          crud.data2 = data.data.data // 表格多数据，涉及到改动比较大（暂时这样写，其实不该这样写）
+          crud.data = data.dataList
+          crud.page.total = data.allNum
+          crud.data2 = data // 表格多数据，涉及到改动比较大（暂时这样写，其实不该这样写）
           crud.resetDataStatus()
           // time 毫秒后显示表格
           setTimeout(() => {
@@ -265,10 +265,12 @@ function CRUD(options) {
         return
       }
       crud.status.add = CRUD.STATUS.PROCESSING
+
       crud.crudMethod.add(crud.form).then((res) => {
+        console.log(res,'添加')
         crud.status.add = CRUD.STATUS.NORMAL
         crud.resetForm()
-        crud.addSuccessNotify(res.data.msg)
+        crud.addSuccessNotify(res)
         callVmHook(crud, CRUD.HOOK.afterSubmit)
         crud.toQuery()
       }).catch(() => {
@@ -288,6 +290,7 @@ function CRUD(options) {
         crud.status.edit = CRUD.STATUS.NORMAL
         crud.getDataStatus(crud.getDataId(crud.form)).edit = CRUD.STATUS.NORMAL
         crud.editSuccessNotify()
+        console.log('重置表单')
         crud.resetForm()
         callVmHook(crud, CRUD.HOOK.afterSubmit)
         crud.refresh()
@@ -350,7 +353,7 @@ function CRUD(options) {
     /**
      * 获取查询参数
      */
-    getQueryParams: function() {
+    getQueryParams: function () {
       if (crud.pageSize != 10) {
         crud.page.size = crud.pageSize
         crud.pageSize = 10
@@ -433,15 +436,21 @@ function CRUD(options) {
      * @param {Array} data 数据
      */
     resetForm(data) {
+      console.log(data, '重置')
       const form = data || (typeof crud.defaultForm === 'object' ? JSON.parse(JSON.stringify(crud.defaultForm)) : crud.defaultForm.apply(crud.findVM('form')))
+      console.log(form,'重置前')
+      
       const crudFrom = crud.form
-      for (const key in form) {
-        if (crudFrom.hasOwnProperty(key)) {
-          crudFrom[key] = form[key]
-        } else {
-          Vue.set(crudFrom, key, form[key])
+      console.log(form, '重置后1',crud.form)
+        for (const key in form) {
+          if (crudFrom.hasOwnProperty(key)) {
+            crudFrom[key] = form[key]
+          } else {
+            Vue.set(crudFrom, key, form[key])
+          }
         }
-      }
+      
+      console.log(crud.form, '重置后')
     },
     /**
      * 重置数据状态

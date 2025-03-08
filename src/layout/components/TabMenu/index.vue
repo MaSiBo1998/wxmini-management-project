@@ -14,60 +14,22 @@
           <span>招募管理</span>
         </template>
       </el-menu-item>
-      <el-menu-item index="/home">
+      <el-menu-item index="/notice">
         <template slot="title">
           <i class="el-icon-s-platform"></i>
           <span>演出预告</span>
         </template>
       </el-menu-item>
-      <el-menu-item index="/home">
+      <el-menu-item index="/case">
         <template slot="title">
           <i class="el-icon-s-platform"></i>
           <span>经典案例</span>
         </template>
       </el-menu-item>
-      <el-menu-item index="/home">
+      <el-menu-item index="/user">
         <template slot="title">
           <i class="el-icon-s-platform"></i>
           <span>账号管理</span>
-        </template>
-      </el-menu-item>
-      <el-submenu index="2">
-        <template slot="title">
-          <i class="el-icon-data-analysis"></i>
-          <span>报表</span>
-        </template>
-        <el-submenu index="2-1">
-          <template slot="title">产品</template>
-          <el-menu-item index="/installRegisterRate">安装注册率</el-menu-item>
-          <el-menu-item index="/codeReWriteRate">验证码回填率</el-menu-item>
-          <el-menu-item index="/registerStep">注册完件率</el-menu-item>
-          <el-menu-item index="/firstLoanConfirm">首贷确认报表</el-menu-item>
-          <el-menu-item index="/firstLoanOptimizeRate">首贷优化确认率</el-menu-item>
-          <el-menu-item index="/reLoanApplyRate">复贷申请转化率</el-menu-item>
-          <el-menu-item index="/reloanRepaymentRate">首复贷申请率</el-menu-item>
-          <el-menu-item index="/reloanConfirmRate">首复贷确认率</el-menu-item>
-          <el-menu-item index="/paymentFailRate">放款失败率</el-menu-item>
-        </el-submenu>
-        <el-submenu index="2-2">
-          <template slot="title">运营</template>
-          <el-menu-item index="/inviteData">邀请数据(墨西哥)</el-menu-item>
-          <el-menu-item index="/inviteDataCo">邀请数据(哥伦比亚)</el-menu-item>
-        </el-submenu>
-        <el-submenu index="2-3">
-          <template slot="title">风控</template>
-          <el-menu-item index="/newOldUserPassRate">新老客通过率</el-menu-item>
-          <el-menu-item index="/overdueTrackSummary">逾期追踪汇总</el-menu-item>
-          <el-menu-item index="/androidPassRateNew">安卓通过率(新)</el-menu-item>
-          <el-menu-item index="/androidPassRateOld">安卓通过率(老)</el-menu-item>
-          <el-menu-item index="/androidRiskPrice">安卓风险定价</el-menu-item>
-        </el-submenu>
-
-      </el-submenu>
-      <el-menu-item index="/userManagement">
-        <template slot="title">
-          <i class="el-icon-s-custom"></i>
-          <span>用户管理</span>
         </template>
       </el-menu-item>
     </el-menu>

@@ -14,6 +14,10 @@ module.exports = {
   // add your custom rules here
   //it is base on https://github.com/vuejs/eslint-config-vue
   rules: {
+    "vue/first-attribute-linebreak": ["error", {
+      "singleline": "ignore", // 单行属性不换行
+      "multiline": "below"    // 多行属性换行到下一行
+    }],
     "vue/max-attributes-per-line": [2, {
       "singleline": 10,
       "multiline": {
@@ -22,7 +26,7 @@ module.exports = {
       }
     }],
     "vue/singleline-html-element-content-newline": "off",
-    "vue/multiline-html-element-content-newline":"off",
+    "vue/multiline-html-element-content-newline": "off",
     "vue/name-property-casing": ["error", "PascalCase"],
     "vue/no-v-html": "off",
     'accessor-pairs': 2,
@@ -196,7 +200,7 @@ module.exports = {
     }],
     'array-bracket-spacing': [2, 'never']
   },
-  globals:{
+  globals: {
     error: true
   }
 

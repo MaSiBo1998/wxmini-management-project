@@ -41,38 +41,29 @@ axios.interceptors.response.use(
     console.log(response)
     const code = response.status
     if (response.config.responseType == 'blob') {
-      return response
+      return response.data.data
     }
     if (code < 200 || code > 300) {
       Notification.error({
         title: response.message
       })
       return Promise.reject('error')
-    } else if (code == 403) {
-      if (response.data.msg == '请重新登入') {
+    } else if (code == 200) {
+      if (response.data.code == 0) {
+        return response.data.data
+      } else if (response.data.code == 301) {
         store.dispatch('LogOut').then(() => {
           location.reload() // 为了重新实例化vue-router对象 避免bug
         })
       } else {
-        if (response.data.msg == 'No Login') {
-          return Promise.reject('error')
-        } else {
-          Notification.error({
-            title: response.data.msg
-          })
-        }
-      }
-      return Promise.reject('error')
-    } else if (response.data.code != 0) {
-      if (response.data.msg == 'No Login') {
-        return Promise.reject('error')
-      } else {
         Notification.error({
           title: response.data.msg
         })
+        return Promise.reject('error')
       }
     } else {
-      return response
+      return Promise.reject('error')
+
     }
   },
   error => {

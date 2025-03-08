@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button  :loading="crud.status.cu === 2" :disabled="disabledEdit"  type="primary" @click="crud.toEdit(data)" >编辑</el-button>
+    <el-button   v-if="isHaveEdit" :loading="crud.status.cu === 2" :disabled="disabledEdit"  type="primary" @click="crud.toEdit(data)" >编辑</el-button>
     <el-popover v-model="pop" placement="top" width="180" trigger="manual" @show="onPopoverShow" @hide="onPopoverHide">
       <p>{{ msg }}</p>
       <div style="text-align: right; margin: 0">
@@ -29,6 +29,10 @@ export default {
     disabledEdit: {
       type: Boolean,
       default: false
+    },
+    isHaveEdit: {
+      type: Boolean,
+      default: () => { return true }
     },
     disabledDle: {
       type: Boolean,

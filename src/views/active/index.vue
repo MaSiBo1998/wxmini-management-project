@@ -1,102 +1,314 @@
 <template>
   <div class="app-container">
+    <div style="font-size: 20px;font-weight: 600;">招募管理</div>
     <!--工具栏-->
     <div class="head-container">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-row :gutter="20">
           <el-col :span="6">
-            <el-select v-model="query.appName" @change="crud.toQuery()" clearable size="small" filterable
-              placeholder="请选择APP名称" class="filter-item" style="width: 100%">
-              <el-option label="Rapipeso" :value="1"></el-option>
-              <el-option label="prestapronto" :value="5" />
-              <el-option label="credayuda" :value="6" />
-              <el-option label="Platayuda" :value="12" />
-              <el-option label="Pesoplus" :value="7" />
-              <el-option label="pesoportuna" :value="8" />
-
+            <el-select
+              v-model="query.releaseState"
+              @change="crud.toQuery()"
+              clearable
+              size="small"
+              filterable
+              placeholder="请选择发布状态"
+              class="filter-item"
+              style="width: 100%"
+            >
+              <el-option label="已发布" :value="1" />
+              <el-option label="未发布" :value="0" />
             </el-select>
           </el-col>
-          <el-col :span="6">
-            <el-select v-model="query.platform" @change="crud.toQuery()" clearable size="small" filterable
-              placeholder="请选择平台" class="filter-item" style="width: 100%">
-              <el-option label="全部" value="" />
-              <el-option label="Android" :value="1" />
-              <el-option label="IOS" :value="2" />
-            </el-select>
-          </el-col>
-          <el-col :span="6">
-            <el-date-picker v-model="query.createTime" type="daterange" value-format="yyyy-MM-dd" range-separator=":"
-              size="small" class="date-item" style="width: 100%" start-placeholder="开始日期" end-placeholder="结束日期" />
-          </el-col>
-          <el-col :span="6">
+          <el-col :span="18">
             <rrOperation />
           </el-col>
-
         </el-row>
       </div>
-      <crudOperation>
-        <template slot="right">
-          <div style="display: inline-block">
-            <el-button :loading="crud.downloadLoading" :disabled="!crud.data.length" class="filter-item" size="mini"
-              type="warning" icon="el-icon-download" @click="
-                crud.doExport('/export', 13, 0)
-              ">导出</el-button>
-          </div>
-        </template>
-      </crudOperation>
+      <crudOperation :isHaveAdd="true"> </crudOperation>
     </div>
+    <!--表单渲染 :rules="rules"-->
+    <el-dialog
+      append-to-body
+      :close-on-click-modal="false"
+      :before-close="crud.cancelCU"
+      :visible.sync="crud.status.cu > 0"
+      title="招募活动"
+      width="590px"
+    >
+      <el-form ref="form" :model="form" :rules="rules" size="small" label-width="130px">
+        <el-form-item label="活动名称" prop="name">
+          <el-input v-model="form.name" placeholder="活动名称" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="活动主题" prop="subject">
+          <el-input v-model="form.subject" placeholder="活动主题" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="封面图片" prop="coverImage">
+          <el-input v-model="form.coverImage" placeholder="封面图片" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="活动开始时间" prop="activityStartTime">
+          <el-date-picker
+            v-model="form.activityStartTime"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="活动开始时间"
+            style="width: 360px"
+          />
+        </el-form-item>
+        <el-form-item label="活动结束时间" prop="activityEndTime">
+          <el-date-picker
+            value-format="yyyy-MM-dd HH:mm:ss"
+            v-model="form.activityEndTime"
+            type="datetime"
+            placeholder="活动结束时间"
+            style="width: 360px"
+          />
+        </el-form-item>
+        <el-form-item label="活动地址" prop="location">
+          <el-input v-model="form.location" placeholder="活动地址(多个地址以,分割)" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="报名截止时间" prop="registrationDeadline">
+          <el-date-picker
+            value-format="yyyy-MM-dd HH:mm:ss"
+            v-model="form.registrationDeadline"
+            type="datetime"
+            placeholder="报名截止时间"
+            style="width: 360px"
+          />
+        </el-form-item>
+        <el-form-item label="需要的总人数" prop="requiredTotalNumber">
+          <el-input v-model="form.requiredTotalNumber" placeholder="需要的总人数" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="需要的男性人数" prop="requiredMaleNumber">
+          <el-input v-model="form.requiredMaleNumber" placeholder="需要的男性人数" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="需要的女性人数" prop="requiredFemaleNumber">
+          <el-input v-model="form.requiredFemaleNumber" placeholder="需要的女性人数" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="节目要求" prop="programRequirements">
+          <el-input v-model="form.programRequirements" placeholder="节目要求" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="其他要求描述" prop="otherRequirementsDesc">
+          <el-input v-model="form.otherRequirementsDesc" placeholder="其他要求描述" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="详细描述" prop="detailDesc">
+          <el-input v-model="form.detailDesc" placeholder="详细描述" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="排序" prop="sort">
+          <el-input v-model="form.sort" placeholder="排序" style="width: 360px" />
+        </el-form-item>
+        <!-- <el-form-item label="发布状态" prop="releaseState">
+          <el-input v-model="form.releaseState" placeholder="发布状态" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="发布时间" prop="releaseTime">
+          <el-date-picker v-model="form.releaseTime" type="datetime" placeholder="发布时间" style="width: 360px" />
+        </el-form-item> -->
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="text" @click="crud.cancelCU">取消</el-button>
+        <el-button :loading="crud.status.cu === 2" type="primary" @click="crud.submitCU">确认</el-button>
+      </div>
+    </el-dialog>
+    <!-- 报名人列表展示 -->
+    <el-dialog
+      style="overflow: hidden"
+      :visible.sync="tableDialog"
+      title="演员详情"
+      width="580px"
+      :loading="tableLoading"
+    >
+      <el-table ref="table" v-loading="tableLoading" max-height="600" stripe lazy :data="tableData">
+        <el-table-column prop="userId" align="center" label="用户ID" width="120"> </el-table-column>
+        <el-table-column prop="registrationStatus" align="center" label="报名状态" width="120">
+          <template slot-scope="scope">
+            {{ scope.row.registrationStatus == 0 ? "未审核" : "已审核" }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="registrationTime" align="center" label="报名时间" width="150"> </el-table-column>
+        <el-table-column prop="remarks" align="center" label="备注" width="150"> </el-table-column>
+      </el-table>
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="total"
+        :page-size="pageSize"
+        @current-change="handleCurrentChange"
+      />
+    </el-dialog>
+    <!-- 详情展示 -->
+    <el-dialog style="overflow: hidden" :visible.sync="detailsDialog" title="演员详情" width="580px" :loading="loading">
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          封面图片
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          <el-image
+            style="width: 70px; height: 70px"
+            :src="detail.coverImage ? detail.coverImage.split(',')[0] : ''"
+            :preview-src-list="detail.coverImage ? detail.coverImage.split(',') : []"
+          />
+        </el-col>
+        <el-col :span="5" class="detail-label">
+          活动名称
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.name }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          活动主题
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.subject }}
+        </el-col>
+        <el-col :span="5" class="detail-label">
+          活动开始时间
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.activityStartTime }}
+        </el-col>
+      </el-row>
 
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          活动结束时间
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.activityEndTime }}
+        </el-col>
+        <el-col :span="5" class="detail-label">
+          活动地址
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.location }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          报名截止时间
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.registrationDeadline }}
+        </el-col>
+        <el-col :span="5" class="detail-label">
+          需要的总人数
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.requiredTotalNumber }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          需要的男性人数
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.requiredMaleNumber }}
+        </el-col>
+        <el-col :span="5" class="detail-label">
+          需要的女性人数
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.requiredFemaleNumber }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          节目要求
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.programRequirements }}
+        </el-col>
+        <el-col :span="5" class="detail-label">
+          其他要求描述
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.otherRequirementsDesc }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          详细描述
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.detailDesc }}
+        </el-col>
+        <el-col :span="5" class="detail-label">
+          排序
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.sort }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          发布状态
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.releaseState == 1 ? "已发布" : "未发布" }}
+        </el-col>
+        <el-col :span="5" class="detail-label">
+          发布时间
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.releaseTime }}
+        </el-col>
+      </el-row>
+    </el-dialog>
     <!--表格渲染-->
     <div class="table-box">
       <el-table ref="table" v-loading="crud.loading" max-height="600" stripe lazy :data="crud.data">
-        <el-table-column prop="name" align="center" label="演员名称" width="90" fixed>
-        </el-table-column>
-        <el-table-column prop="gender" align="center" label="性别" width="120">
+        <el-table-column prop="name" align="center" label="活动名称" width="90" fixed> </el-table-column>
+        <el-table-column prop="subject" align="center" label="活动主题" width="120"> </el-table-column>
+        <el-table-column prop="coverImage" align="center" label="封面图片" width="120">
           <template slot-scope="scope">
-            {{
-              scope.row.gender ==1?'男':'女'
-            }}
+            <el-image
+              style="width: 70px; height: 70px"
+              :src="scope.row.coverImage ? scope.row.coverImage.split(',')[0] : ''"
+              :preview-src-list="scope.row.coverImage ? scope.row.coverImage.split(',') : []"
+            />
           </template>
         </el-table-column>
-        <el-table-column prop="age" align="center" label="年龄" width="120">
+        <el-table-column prop="activityStartTime" align="center" label="活动开始时间" width="150"> </el-table-column>
+        <el-table-column prop="activityEndTime" align="center" label="活动结束时间" width="150"> </el-table-column>
+        <el-table-column prop="location" align="center" label="活动地址" width="120"> </el-table-column>
+        <el-table-column prop="registrationDeadline" align="center" label="报名截止时间" width="150"></el-table-column>
+        <el-table-column prop="requiredTotalNumber" align="center" label="需要的总人数" width="120"> </el-table-column>
+        <el-table-column prop="requiredMaleNumber" align="center" label="需要的男性人数" width="120"> </el-table-column>
+        <el-table-column prop="requiredFemaleNumber" align="center" label="需要的女性人数" width="120">
         </el-table-column>
-        <el-table-column prop="height" align="center" label="身高" width="120">
+        <el-table-column prop="programRequirements" align="center" label="节目要求" width="120"> </el-table-column>
+        <el-table-column prop="otherRequirementsDesc" align="center" label="其他要求描述" width="120">
         </el-table-column>
-        <el-table-column prop="weight" align="center" label="体重" width="120">
+        <!-- <el-table-column prop="detailDesc" align="center" label="详细描述" width="120"> </el-table-column> -->
+        <el-table-column prop="sort" align="center" label="排序" width="120"> </el-table-column>
+        <el-table-column prop="releaseState" align="center" label="发布状态" width="120">
+          <template slot-scope="scope">
+            {{ scope.row.releaseState == 1 ? "已发布" : "未发布" }}
+          </template>
         </el-table-column>
-        <el-table-column prop="primarySkillCategory" align="center" label="特长1" width="120">
-        </el-table-column>
-        <el-table-column prop="secondarySkillCategory" align="center" label="特长2" width="120"></el-table-column>
-        <el-table-column prop="thirdlySkillCategory" align="center" label="特长3" width="120">
-        </el-table-column>
-        <el-table-column prop="otherProfessionalCategory" align="center" label="特长补充" width="120">
-        </el-table-column>
-        <el-table-column prop="graduationSchool" align="center" label="毕业学校" width="120">
-        </el-table-column>
-        <el-table-column prop="workingYears" align="center" label="工作年限" width="120">
-        </el-table-column>
-        <el-table-column prop="pastExperiences" align="center" label="过往经历" width="120">
-        </el-table-column>
-        <el-table-column prop="phoneNumber" align="center" label="电话" width="120">
-        </el-table-column>
-        <el-table-column prop="performanceCases" align="center" label="演出案例" width="120">
-        </el-table-column>
-        <!-- <el-table-column prop="coverImage" align="center" label="代表图" width="120">
-        </el-table-column>
-        <el-table-column prop="videoClipUrl" align="center" label="视频" width="120">
-        </el-table-column> -->
-        <el-table-column prop="yetRegistered" align="center" label="已报名项目" width="120">
-        </el-table-column>
-        <el-table-column prop="passRegistered" align="center" label="已通过项目" width="120">
+        <el-table-column prop="releaseTime" align="center" label="发布时间" width="150"> </el-table-column>
+        <el-table-column prop="addBy" align="center" label="创建人" width="120"> </el-table-column>
+        <el-table-column prop="loanCount" align="center" label="操作" width="420" fixed="right">
+          <template slot-scope="scope" align="center">
+            <el-button type="warning" @click="toOpenDetail(scope.row)">详情</el-button>
+            <el-button type="success" @click="openActorList(scope.row)">报名人列表</el-button>
+            <el-button :disabled="scope.row.releaseState == 1" type="primary" @click="examineActive(scope.row)"
+              >发布</el-button
+            >
+            <udOperation :data="scope.row" style="display: inline-block" />
+          </template>
         </el-table-column>
       </el-table>
+      <!--分页组件-->
+      <pagination />
     </div>
-
   </div>
 </template>
 
 <script>
+import crudUser, { examineActive, getActiveDetail, getActiveActorList } from "@/api/active";
 import { mapState } from "vuex";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import CRUD, { presenter, header, form, crud } from "@crud/crud";
@@ -105,55 +317,145 @@ import rrOperation from "@crud/RR.operation";
 import crudOperation from "@crud/CRUD.operation";
 import udOperation from "@crud/UD.operation";
 const defaultForm = {
-  type: 2,
-  content: null,
-  creator: null,
-  editor: null,
+  name: null,
+  subject: null,
+  coverImage: null,
+  activityStartTime: null,
+  activityEndTime: null,
+  location: null,
+  registrationDeadline: null,
+  requiredTotalNumber: null,
+  requiredMaleNumber: null,
+  requiredFemaleNumber: null,
+  programRequirements: null,
+  otherRequirementsDesc: null,
+  detailDesc: null,
+  sort: null
+  // releaseState: null,
+  // releaseTime: null
 };
 export default {
   name: "",
   components: { crudOperation, rrOperation, pagination, udOperation },
   cruds() {
     return CRUD({
-      url: "/admin/actor/list",
+      url: "/admin/activity/list",
       method: "post",
-      query: {
-        tableName: 'PASS_RATE_NEW'
-      }
+      crudMethod: { ...crudUser }
     });
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   data() {
     return {
-
+      rules: {
+        name: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
+        subject: [{ required: true, message: "请输入活动主题", trigger: "blur" }],
+        coverImage: [{ required: true, message: "请输入封面图片", trigger: "blur" }],
+        activityStartTime: [{ required: true, message: "请选择活动开始时间", trigger: "change" }],
+        activityEndTime: [{ required: true, message: "请选择活动结束时间", trigger: "change" }],
+        location: [{ required: true, message: "请输入活动地址", trigger: "blur" }],
+        registrationDeadline: [{ required: true, message: "请选择报名截止时间", trigger: "change" }],
+        requiredTotalNumber: [{ required: true, message: "请输入需要的总人数", trigger: "blur" }],
+        requiredMaleNumber: [{ required: true, message: "请输入需要的男性人数", trigger: "blur" }],
+        requiredFemaleNumber: [{ required: true, message: "请输入需要的女性人数", trigger: "blur" }]
+      },
+      detailsDialog: false,
+      detail: {},
+      loading: false,
+      tableLoading: false,
+      tableDialog: false,
+      tableData: [],
+      pageSize: 10,
+      currentPage: 1,
+      activityId: "",
+      total: 0
     };
   },
-  computed: {
-
-  },
+  computed: {},
   created() {
+    console.log(this.crud.data);
   },
   methods: {
-    [CRUD.HOOK.beforeReset](crud) {
-
+    [CRUD.HOOK.beforeToAdd](crud, form) {
+      this.form.id = null;
     },
-    [CRUD.HOOK.beforeRefresh](crud) {
-      if (this.query.createTime) {
-        crud.query.dateStart = this.query.createTime[0];
-        crud.query.dateEnd = this.query.createTime[1];
-      } else {
-        crud.query.dateStart = undefined;
-        crud.query.dateEnd = undefined;
-      }
+    openActorList(row) {
+      this.activityId = row.id;
+      this.tableDialog = true;
+      this.getActiveActorList(this.activityId);
     },
-  },
+    getActiveActorList(activityId) {
+      this.tableLoading = true;
+      let params = {
+        activityId: activityId,
+        pageSize: this.pageSize,
+        pageNum: this.currentPage
+      };
+      getActiveActorList(params)
+        .then(res => {
+          console.log(res, "报名人列表");
+          this.tableData = res.dataList;
+          this.tableLoading = false;
+          this.total = res.allPageNum;
+        })
+        .catch(err => {
+          this.tableLoading = false;
+        });
+    },
+    handleCurrentChange(page) {
+      this.currentPage = page;
+      this.getActiveActorList(this.activityId);
+    },
+    toOpenDetail(data) {
+      this.detailsDialog = true;
+      let params = {
+        id: data.id
+      };
+      this.loading = true;
+      getActiveDetail(params)
+        .then(res => {
+          console.log(res, "详情");
+          this.detail = res;
+          this.loading = false;
+        })
+        .catch(err => {
+          this.loading = false;
+        });
+    },
+    examineActive(row) {
+      this.$confirm("是否发布该活动?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let params = (params = {
+            id: row.id,
+            releaseState: 1
+          });
+          examineActive(params).then(res => {
+            this.$message({
+              type: "success",
+              message: "发布成功!"
+            });
+            this.crud.refresh();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消发布"
+          });
+        });
+    }
+  }
 };
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .table-box {
   padding: 20px;
-  background-color: #FFF;
+  background-color: #fff;
   box-shadow: 5px;
 }
 
@@ -161,5 +463,27 @@ export default {
 .el-table td.el-table__cell {
   border-bottom: 2px solid #23b7e5;
 }
-</style>
+.detail-row {
+  margin-bottom: 10px;
+}
 
+.detail-label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.detail-value {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.detail-value a {
+  color: #409eff;
+  text-decoration: none;
+}
+
+.detail-value a:hover {
+  text-decoration: underline;
+}
+</style>

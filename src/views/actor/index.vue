@@ -1,102 +1,203 @@
 <template>
   <div class="app-container">
     <!--工具栏-->
+    <div style="font-size: 20px;font-weight: 600;">演员管理</div>
     <div class="head-container">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-row :gutter="20">
-          <el-col :span="6">
-            <el-select v-model="query.appName" @change="crud.toQuery()" clearable size="small" filterable
-              placeholder="请选择APP名称" class="filter-item" style="width: 100%">
-              <el-option label="Rapipeso" :value="1"></el-option>
-              <el-option label="prestapronto" :value="5" />
-              <el-option label="credayuda" :value="6" />
-              <el-option label="Platayuda" :value="12" />
-              <el-option label="Pesoplus" :value="7" />
-              <el-option label="pesoportuna" :value="8" />
-
-            </el-select>
-          </el-col>
-          <el-col :span="6">
-            <el-select v-model="query.platform" @change="crud.toQuery()" clearable size="small" filterable
-              placeholder="请选择平台" class="filter-item" style="width: 100%">
-              <el-option label="全部" value="" />
-              <el-option label="Android" :value="1" />
-              <el-option label="IOS" :value="2" />
-            </el-select>
-          </el-col>
-          <el-col :span="6">
-            <el-date-picker v-model="query.createTime" type="daterange" value-format="yyyy-MM-dd" range-separator=":"
-              size="small" class="date-item" style="width: 100%" start-placeholder="开始日期" end-placeholder="结束日期" />
-          </el-col>
-          <el-col :span="6">
+          <el-col :span="24">
             <rrOperation />
           </el-col>
-
         </el-row>
       </div>
-      <crudOperation>
-        <template slot="right">
-          <div style="display: inline-block">
-            <el-button :loading="crud.downloadLoading" :disabled="!crud.data.length" class="filter-item" size="mini"
-              type="warning" icon="el-icon-download" @click="
-                crud.doExport('/export', 13, 0)
-              ">导出</el-button>
-          </div>
-        </template>
-      </crudOperation>
+      <crudOperation> </crudOperation>
     </div>
-
+    <!-- 详情展示 -->
+    <el-dialog style="overflow: hidden" :visible.sync="detailsDialog" title="演员详情" width="580px" :loading="loading">
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          姓名
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.name }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          代表图
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          <el-image
+            style="width: 70px; height: 70px"
+            :src="detail.coverImage ? detail.coverImage.split(',')[0] : ''"
+            :preview-src-list="detail.coverImage ? detail.coverImage.split(',') : []"
+          />
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          年龄
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.age }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          性别
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.gender == 1 ? "男" : "女" }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          电话
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.phoneNumber }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          特长1
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.primarySkillCategory }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        
+        <el-col :span="4" class="detail-label">
+          特长2
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.secondarySkillCategory }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          特长3
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.thirdlySkillCategory }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          其他特长
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.otherProfessionalCategory }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          毕业学校
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.graduationSchool }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          工作年限
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.workingYears }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          身高
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.height }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          体重
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.weight }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          过往经历
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.pastExperiences }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          演出案例
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.performanceCases }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          视频
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          <a :href="detail.videoClipUrl" target="_blank">查看视频</a>
+        </el-col>
+      </el-row>
+    </el-dialog>
     <!--表格渲染-->
     <div class="table-box">
       <el-table ref="table" v-loading="crud.loading" max-height="600" stripe lazy :data="crud.data">
-        <el-table-column prop="name" align="center" label="演员名称" width="90" fixed>
-        </el-table-column>
-        <el-table-column prop="gender" align="center" label="性别" width="120">
+        <el-table-column prop="name" align="center" label="演员名称" width="90" fixed> </el-table-column>
+        <el-table-column prop="gender" align="center" label="性别">
           <template slot-scope="scope">
-            {{
-              scope.row.gender ==1?'男':'女'
-            }}
+            {{ scope.row.gender == 1 ? "男" : "女" }}
           </template>
         </el-table-column>
-        <el-table-column prop="age" align="center" label="年龄" width="120">
+        <el-table-column prop="phoneNumber" align="center" label="电话" width="100"> </el-table-column>
+        <el-table-column prop="age" align="center" label="年龄"> </el-table-column>
+        <el-table-column prop="height" align="center" label="身高"> </el-table-column>
+        <el-table-column prop="weight" align="center" label="体重"> </el-table-column>
+        <!-- <el-table-column prop="primarySkillCategory" align="center" label="特长1" >
         </el-table-column>
-        <el-table-column prop="height" align="center" label="身高" width="120">
+        <el-table-column prop="secondarySkillCategory" align="center" label="特长2" ></el-table-column>
+        <el-table-column prop="thirdlySkillCategory" align="center" label="特长3" >
         </el-table-column>
-        <el-table-column prop="weight" align="center" label="体重" width="120">
-        </el-table-column>
-        <el-table-column prop="primarySkillCategory" align="center" label="特长1" width="120">
-        </el-table-column>
-        <el-table-column prop="secondarySkillCategory" align="center" label="特长2" width="120"></el-table-column>
-        <el-table-column prop="thirdlySkillCategory" align="center" label="特长3" width="120">
-        </el-table-column>
-        <el-table-column prop="otherProfessionalCategory" align="center" label="特长补充" width="120">
-        </el-table-column>
-        <el-table-column prop="graduationSchool" align="center" label="毕业学校" width="120">
-        </el-table-column>
-        <el-table-column prop="workingYears" align="center" label="工作年限" width="120">
-        </el-table-column>
-        <el-table-column prop="pastExperiences" align="center" label="过往经历" width="120">
-        </el-table-column>
-        <el-table-column prop="phoneNumber" align="center" label="电话" width="120">
-        </el-table-column>
-        <el-table-column prop="performanceCases" align="center" label="演出案例" width="120">
-        </el-table-column>
-        <!-- <el-table-column prop="coverImage" align="center" label="代表图" width="120">
-        </el-table-column>
-        <el-table-column prop="videoClipUrl" align="center" label="视频" width="120">
+        <el-table-column prop="otherProfessionalCategory" align="center" label="特长补充" >
         </el-table-column> -->
-        <el-table-column prop="yetRegistered" align="center" label="已报名项目" width="120">
+        <el-table-column prop="graduationSchool" align="center" label="毕业学校"> </el-table-column>
+        <el-table-column prop="workingYears" align="center" label="工作年限"> </el-table-column>
+        <!-- <el-table-column prop="pastExperiences" align="center" label="过往经历" > </el-table-column>
+
+        <el-table-column prop="performanceCases" align="center" label="演出案例" > </el-table-column>
+        <el-table-column prop="coverImage" align="center" label="代表图" >
         </el-table-column>
-        <el-table-column prop="passRegistered" align="center" label="已通过项目" width="120">
+        <el-table-column prop="videoClipUrl" align="center" label="视频" >
+        </el-table-column>
+        <el-table-column prop="yetRegistered" align="center" label="已报名项目" > </el-table-column>
+        <el-table-column prop="passRegistered" align="center" label="已通过项目" > </el-table-column> -->
+        <el-table-column prop="gender" align="center" label="是否审核">
+          <template slot-scope="scope">
+            {{ scope.row.auditState == 1 ? "已审核" : "未审核" }}
+          </template>
+        </el-table-column>
+        <!-- 状态 -->
+        <el-table-column label="是否显示" prop="isShow" width="80px" align="center">
+          <template slot-scope="scope">
+            <el-switch
+              disabled
+              v-model="scope.row.isShow"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              :active-value="1"
+              :inactive-value="0"
+              @click.native="changeStatus(scope.row)"
+            >
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column prop="loanCount" align="center" label="操作" width="250">
+          <template slot-scope="scope" align="center">
+            <el-button type="warning" @click="toOpenDetail(scope.row)">详情</el-button>
+            <el-button :disabled="scope.row.auditState == 1" type="primary" @click="examineActor(scope.row)"
+              >审核</el-button
+            >
+            <udOperation :isHaveEdit="false" :data="scope.row" style="display: inline-block" />
+          </template>
         </el-table-column>
       </el-table>
+       <!--分页组件-->
+    <pagination />
     </div>
-
   </div>
 </template>
 
 <script>
+import crudUser, { changeStatus, examineActor, getActorDetail } from "@/api/actor/index";
 import { mapState } from "vuex";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import CRUD, { presenter, header, form, crud } from "@crud/crud";
@@ -108,7 +209,7 @@ const defaultForm = {
   type: 2,
   content: null,
   creator: null,
-  editor: null,
+  editor: null
 };
 export default {
   name: "",
@@ -117,26 +218,37 @@ export default {
     return CRUD({
       url: "/admin/actor/list",
       method: "post",
-      query: {
-        tableName: 'PASS_RATE_NEW'
-      }
+      crudMethod: { ...crudUser }
     });
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   data() {
     return {
-
+      detailsDialog: false,
+      detail: {},
+      loading: false
     };
   },
-  computed: {
-
-  },
-  created() {
-  },
+  computed: {},
+  created() {},
   methods: {
-    [CRUD.HOOK.beforeReset](crud) {
-
+    toOpenDetail(data) {
+      this.detailsDialog = true;
+      let params = {
+        userId: data.userId
+      };
+      this.loading = true;
+      getActorDetail(params)
+        .then(res => {
+          console.log(res, "详情");
+          this.detail = res.data;
+          this.loading = false;
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
+    [CRUD.HOOK.beforeReset](crud) {},
     [CRUD.HOOK.beforeRefresh](crud) {
       if (this.query.createTime) {
         crud.query.dateStart = this.query.createTime[0];
@@ -146,14 +258,87 @@ export default {
         crud.query.dateEnd = undefined;
       }
     },
-  },
+    examineActor(row) {
+      this.$confirm("确认审核通过该演员", "", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        // 业务逻辑
+        let params = (params = {
+          id: row.id,
+          auditState: 1
+        });
+        examineActor(params).then(res => {
+          if (res.code == 0) {
+            console.log(res, "结果");
+            this.$message({
+              duration: 3000,
+              message: res.data,
+              type: "success"
+            });
+          }
+        });
+        setTimeout(() => {
+          this.crud.refresh();
+        }, 600);
+      });
+    },
+    // 改变状态
+    changeStatus(row) {
+      let msg = "";
+      if (row.isShow === 1) {
+        msg = "确认隐藏演员显示";
+      } else {
+        msg = "确认打开演员显示";
+      }
+
+      this.$confirm(msg, "", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        // 业务逻辑
+        let params = "";
+        if (row.isShow === 1) {
+          params = {
+            id: row.id,
+            isShow: 0
+          };
+        } else {
+          params = {
+            id: row.id,
+            isShow: 1
+          };
+        }
+        changeStatus(params).then(res => {
+          if (res.code == 0) {
+            console.log(res, "结果");
+            this.$message({
+              duration: 3000,
+              message: res.data,
+              type: "success"
+            });
+          }
+        });
+        setTimeout(() => {
+          this.crud.refresh();
+        }, 600);
+      });
+    }
+  }
 };
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+.header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
 .table-box {
   padding: 20px;
-  background-color: #FFF;
+  background-color: #fff;
   box-shadow: 5px;
 }
 
@@ -161,5 +346,36 @@ export default {
 .el-table td.el-table__cell {
   border-bottom: 2px solid #23b7e5;
 }
-</style>
 
+.el-switch.is-disabled {
+  opacity: 1;
+}
+
+/deep/.el-switch.is-disabled .el-switch__core,
+.el-switch.is-disabled .el-switch__label {
+  cursor: pointer;
+}
+.detail-row {
+  margin-bottom: 10px;
+}
+
+.detail-label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.detail-value {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.detail-value a {
+  color: #409eff;
+  text-decoration: none;
+}
+
+.detail-value a:hover {
+  text-decoration: underline;
+}
+</style>
