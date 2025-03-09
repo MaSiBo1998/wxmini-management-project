@@ -34,9 +34,9 @@ const user = {
         console.log(userInfo)
         login(userInfo.loginAccount, userInfo.loginPassword).then(res => {
           console.log(res,'qucunchu')
-          setToken(res.data.data.token, rememberMe)
-          commit('SET_TOKEN', res.data.data.token)
-          commit('SET_USER', res.data.data)
+          setToken(res.token, rememberMe)
+          commit('SET_TOKEN', res.token)
+          commit('SET_USER', res)
           resolve()
         }).catch(error => {
 

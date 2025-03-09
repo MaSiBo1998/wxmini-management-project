@@ -40,11 +40,11 @@
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
-          <span style="display:block;height-line" @click="dialog = true">
+          <!-- <span style="display:block;height-line" @click="dialog = true">
             <el-dropdown-item>
               修改密码
             </el-dropdown-item>
-          </span>
+          </span> -->
           <span style="display:block;" @click="open">
             <el-dropdown-item>
               退出登录

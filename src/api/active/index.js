@@ -2,7 +2,7 @@ import { request1 } from '@/utils/request'
 
 export function examineActive(data) {
   return request1({
-    url: '/admin/actor/audit',
+    url: '/admin/activity/release',
     method: 'post',
     data
   })
