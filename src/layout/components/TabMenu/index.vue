@@ -32,6 +32,12 @@
           <span>账号管理</span>
         </template>
       </el-menu-item>
+      <el-menu-item index="/banner">
+        <template slot="title">
+          <i class="el-icon-s-platform"></i>
+          <span>Banner配置</span>
+        </template>
+      </el-menu-item>
     </el-menu>
     <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">

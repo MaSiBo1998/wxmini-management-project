@@ -23,15 +23,15 @@
       width="590px"
     >
       <el-form ref="form" :model="form" :rules="rules" size="small" label-width="120px">
-        <el-form-item label="活动名称" prop="name">
+        <!-- <el-form-item label="活动名称" prop="name">
           <el-input v-model="form.name" placeholder="活动名称" style="width: 360px" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="活动主题" prop="subject">
           <el-input v-model="form.subject" placeholder="活动主题" style="width: 360px" />
         </el-form-item>
-        <el-form-item label="封面图片" prop="coverImage">
+        <!-- <el-form-item label="封面图片" prop="coverImage">
           <el-input v-model="form.coverImage" placeholder="封面图片" style="width: 360px" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="活动开始时间" prop="activityStartTime">
           <el-date-picker
             v-model="form.activityStartTime"
@@ -62,7 +62,7 @@
     <!--表格渲染-->
     <div class="table-box">
       <el-table ref="table" v-loading="crud.loading" max-height="600" stripe lazy :data="crud.data">
-        <el-table-column prop="name" align="center" label="活动名称"> </el-table-column>
+        <!-- <el-table-column prop="name" align="center" label="活动名称"> </el-table-column> -->
         <el-table-column prop="subject" align="center" label="活动主题"> </el-table-column>
         <el-table-column prop="location" align="center" label="活动地址"> </el-table-column>
         <el-table-column prop="activityStartTime" align="center" label="活动开始时间"> </el-table-column>

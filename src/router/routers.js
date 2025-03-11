@@ -46,6 +46,12 @@ export const constantRouterMap = [
         component: (resolve) => require(['@/views/user/index'], resolve),
         hidden: true
       },
+      {
+        path: '/banner',
+        name: 'case',
+        component: (resolve) => require(['@/views/banner/index'], resolve),
+        hidden: true
+      },
 
     ]
   }

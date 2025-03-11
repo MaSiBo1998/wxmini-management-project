@@ -35,17 +35,35 @@
       :before-close="crud.cancelCU"
       :visible.sync="crud.status.cu > 0"
       title="招募活动"
-      width="590px"
+      width="750px"
     >
       <el-form ref="form" :model="form" :rules="rules" size="small" label-width="130px">
         <el-form-item label="活动名称" prop="name">
-          <el-input v-model="form.name" placeholder="活动名称" style="width: 360px" />
+          <el-input v-model="form.name" placeholder="活动名称" style="width: 560px" />
         </el-form-item>
         <el-form-item label="活动主题" prop="subject">
-          <el-input v-model="form.subject" placeholder="活动主题" style="width: 360px" />
+          <el-input v-model="form.subject" placeholder="活动主题" style="width: 560px" />
+        </el-form-item>
+        <el-form-item label="选择图片上传">
+          <el-upload
+            class="upload-demo"
+            ref="upload"
+            :headers="{
+              token: token
+            }"
+            :action="uploadUrl"
+            :on-success="handleSuccess"
+            :on-remove="handleRemove"
+            :file-list="fileList"
+            :auto-upload="true"
+            :limit="1"
+          >
+            <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+            <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
+          </el-upload>
         </el-form-item>
         <el-form-item label="封面图片" prop="coverImage">
-          <el-input v-model="form.coverImage" placeholder="封面图片" style="width: 360px" />
+          <el-input v-model="form.coverImage" placeholder="封面图片" style="width: 560px" />
         </el-form-item>
         <el-form-item label="活动开始时间" prop="activityStartTime">
           <el-date-picker
@@ -53,7 +71,7 @@
             type="datetime"
             value-format="yyyy-MM-dd HH:mm:ss"
             placeholder="活动开始时间"
-            style="width: 360px"
+            style="width: 560px"
           />
         </el-form-item>
         <el-form-item label="活动结束时间" prop="activityEndTime">
@@ -62,11 +80,11 @@
             v-model="form.activityEndTime"
             type="datetime"
             placeholder="活动结束时间"
-            style="width: 360px"
+            style="width: 560px"
           />
         </el-form-item>
         <el-form-item label="活动地址" prop="location">
-          <el-input v-model="form.location" placeholder="活动地址(多个地址以,分割)" style="width: 360px" />
+          <el-input v-model="form.location" placeholder="活动地址(多个地址以,分割)" style="width: 560px" />
         </el-form-item>
         <el-form-item label="报名截止时间" prop="registrationDeadline">
           <el-date-picker
@@ -74,35 +92,35 @@
             v-model="form.registrationDeadline"
             type="datetime"
             placeholder="报名截止时间"
-            style="width: 360px"
+            style="width: 560px"
           />
         </el-form-item>
         <el-form-item label="需要的总人数" prop="requiredTotalNumber">
-          <el-input v-model="form.requiredTotalNumber" placeholder="需要的总人数" style="width: 360px" />
+          <el-input v-model="form.requiredTotalNumber" placeholder="需要的总人数" style="width: 560px" />
         </el-form-item>
         <el-form-item label="需要的男性人数" prop="requiredMaleNumber">
-          <el-input v-model="form.requiredMaleNumber" placeholder="需要的男性人数" style="width: 360px" />
+          <el-input v-model="form.requiredMaleNumber" placeholder="需要的男性人数" style="width: 560px" />
         </el-form-item>
         <el-form-item label="需要的女性人数" prop="requiredFemaleNumber">
-          <el-input v-model="form.requiredFemaleNumber" placeholder="需要的女性人数" style="width: 360px" />
+          <el-input v-model="form.requiredFemaleNumber" placeholder="需要的女性人数" style="width: 560px" />
         </el-form-item>
         <el-form-item label="节目要求" prop="programRequirements">
-          <el-input v-model="form.programRequirements" placeholder="节目要求" style="width: 360px" />
+          <el-input v-model="form.programRequirements" placeholder="节目要求" style="width: 560px" />
         </el-form-item>
         <el-form-item label="其他要求描述" prop="otherRequirementsDesc">
-          <el-input v-model="form.otherRequirementsDesc" placeholder="其他要求描述" style="width: 360px" />
+          <el-input v-model="form.otherRequirementsDesc" placeholder="其他要求描述" style="width: 560px" />
         </el-form-item>
         <el-form-item label="详细描述" prop="detailDesc">
-          <el-input v-model="form.detailDesc" placeholder="详细描述" style="width: 360px" />
+          <quill-editor v-model="form.detailDesc" ref="myQuillEditor"></quill-editor>
         </el-form-item>
         <el-form-item label="排序" prop="sort">
-          <el-input v-model="form.sort" placeholder="排序" style="width: 360px" />
+          <el-input v-model="form.sort" placeholder="排序" style="width: 560px" />
         </el-form-item>
         <!-- <el-form-item label="发布状态" prop="releaseState">
-          <el-input v-model="form.releaseState" placeholder="发布状态" style="width: 360px" />
+          <el-input v-model="form.releaseState" placeholder="发布状态" style="width: 560px" />
         </el-form-item>
         <el-form-item label="发布时间" prop="releaseTime">
-          <el-date-picker v-model="form.releaseTime" type="datetime" placeholder="发布时间" style="width: 360px" />
+          <el-date-picker v-model="form.releaseTime" type="datetime" placeholder="发布时间" style="width: 560px" />
         </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -119,14 +137,20 @@
       :loading="tableLoading"
     >
       <el-table ref="table" v-loading="tableLoading" max-height="600" stripe lazy :data="tableData">
-        <el-table-column prop="userId" align="center" label="用户ID" width="120"> </el-table-column>
+        <el-table-column prop="userId" align="center" label="报名人姓名" width="120"> </el-table-column>
         <el-table-column prop="registrationStatus" align="center" label="报名状态" width="120">
           <template slot-scope="scope">
             {{ scope.row.registrationStatus == 0 ? "未审核" : "已审核" }}
           </template>
         </el-table-column>
         <el-table-column prop="registrationTime" align="center" label="报名时间" width="150"> </el-table-column>
-        <el-table-column prop="remarks" align="center" label="备注" width="150"> </el-table-column>
+        <el-table-column prop="remarks" align="center" label="操作" width="150">
+          <template slot-scope="scope">
+            <el-button type="success" @click="pass(scope.row)">通过</el-button>
+            <el-button type="warning" @click="reject(scope.row)">拒绝</el-button>
+          </template>
+          
+        </el-table-column>
       </el-table>
       <el-pagination
         background
@@ -308,6 +332,14 @@
 </template>
 
 <script>
+// require styles
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+import { quillEditor } from 'vue-quill-editor'
+import { getToken } from "@/utils/auth";
+import { root1 } from "@/utils/request";
 import crudUser, { examineActive, getActiveDetail, getActiveActorList } from "@/api/active";
 import { mapState } from "vuex";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -336,7 +368,7 @@ const defaultForm = {
 };
 export default {
   name: "",
-  components: { crudOperation, rrOperation, pagination, udOperation },
+  components: { crudOperation, rrOperation, pagination, udOperation,quillEditor },
   cruds() {
     return CRUD({
       url: "/admin/activity/list",
@@ -368,16 +400,45 @@ export default {
       pageSize: 10,
       currentPage: 1,
       activityId: "",
-      total: 0
+      total: 0,
+      uploadUrl: "",
+      token: '',
+      fileList: []
     };
   },
   computed: {},
   created() {
     console.log(this.crud.data);
+    this.uploadUrl = root1 + "/admin/upload/uploadVideo";
+    this.token = getToken();
   },
   methods: {
+    handleSuccess(response, file, fileList) {
+      if(response.code === 0) {
+        this.form.coverImage = response.data.httpPath;
+        this.fileList[0].url = response.data.httpPath;
+      }else{
+        this.form.coverImage = '';
+        this.fileList = []
+      }
+    },
+    handleRemove(file, fileList) {
+      this.fileList = [];
+      this.form.coverImage = '';
+    },
     [CRUD.HOOK.beforeToAdd](crud, form) {
       this.form.id = null;
+      this.fileList = [];
+    },
+    [CRUD.HOOK.beforeToEdit](crud, form) {
+      console.log(form, "form");
+      this.fileList = [
+        {
+          name: "封面图片",
+          url: form.coverImage
+        }
+      ];
+      // this.fileList = [];
     },
     openActorList(row) {
       this.activityId = row.id;
@@ -400,6 +461,58 @@ export default {
         })
         .catch(err => {
           this.tableLoading = false;
+        });
+    },
+    pass(row) {
+      this.$confirm("是否通过该用户报名?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let params = {
+            id: row.id,
+            registrationStatus: 1
+          };
+          examineActive(params).then(res => {
+            this.$message({
+              type: "success",
+              message: "操作成功!"
+            });
+            this.getActiveActorList(this.activityId);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
+        });
+    },
+    reject(row) {
+      this.$confirm("是否拒绝该用户报名?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let params = {
+            id: row.id,
+            registrationStatus: 2
+          };
+          examineActive(params).then(res => {
+            this.$message({
+              type: "success",
+              message: "操作成功!"
+            });
+            this.getActiveActorList(this.activityId);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
         });
     },
     handleCurrentChange(page) {
@@ -486,4 +599,4 @@ export default {
 .detail-value a:hover {
   text-decoration: underline;
 }
-</style>
+</styl>

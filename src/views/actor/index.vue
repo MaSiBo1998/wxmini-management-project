@@ -241,7 +241,7 @@ export default {
       getActorDetail(params)
         .then(res => {
           console.log(res, "详情");
-          this.detail = res.data;
+          this.detail = res;
           this.loading = false;
         })
         .catch(err => {
