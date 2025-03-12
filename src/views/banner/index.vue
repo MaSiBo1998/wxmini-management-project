@@ -44,21 +44,35 @@
         <el-form-item label="banner图片" prop="coverImage">
           <el-input v-model="form.coverImage" placeholder="banner图片" style="width: 360px" />
         </el-form-item>
-        <el-form-item label="跳转类型" prop="activityStartTime">
+        <el-form-item label="跳转类型" prop="routeType">
           <el-select
-            v-model="form.type"
+            v-model="form.routeType"
+            size="small"
+            placeholder="请选择跳转类型"
+            class="filter-item"
+            style="width: 360px"
+          >
+            <el-option label="跳转活动" :value="'1'" />
+            <el-option label="外部跳转" :value="'2'" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="选择跳转活动" prop="activityId" v-if="form.routeType
+         == 1">
+          <el-select
+            v-model="form.activityId"
             size="small"
             filterable
             placeholder="请选择跳转类型"
             class="filter-item"
-            style="width: 180px"
+            style="width: 360px"
+            @change="activeChange"
           >
-            <el-option label="内部活动" :value="1" />
-            <el-option label="外部外部链接" :value="0" />
+            <el-option v-for="item,index in activityList" :key="index"  :label="item.name" :value="item.id" />
+
           </el-select>
         </el-form-item>
-        <el-form-item label="跳转链接" prop="detailDesc">
-          <el-input v-model="form.detailDesc" placeholder="跳转链接" style="width: 360px" />
+        <el-form-item label="跳转链接" prop="httpPath" v-if="form.routeType == 2">
+          <el-input v-model="form.httpPath" placeholder="跳转链接" style="width: 360px" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -78,9 +92,16 @@
             />
           </template>
         </el-table-column>
-        <el-table-column prop="activityStartTime" align="center" label="跳转类型"> </el-table-column>
-        <el-table-column prop="activityStartTime" align="center" label="跳转活动名称"> </el-table-column>
-        <el-table-column prop="activityStartTime" align="center" label="跳转链接"> </el-table-column>
+        <el-table-column prop="activityStartTime" align="center" label="跳转类型">
+
+        <template slot-scope="scope">
+
+            {{scope.row.routeType ==1? '跳转活动':'外部跳转'}}
+
+        </template>
+        </el-table-column>
+        <el-table-column prop="activityName" align="center" label="跳转活动名称" width="130"> </el-table-column>
+        <el-table-column prop="httpPath" align="center" label="跳转链接"> </el-table-column>
         <el-table-column prop="addBy" align="center" label="创建人"> </el-table-column>
         <el-table-column prop="loanCount" align="center" label="操作" width="280" fixed="right">
           <template slot-scope="scope" align="center">
@@ -97,7 +118,7 @@
 <script>
 import { getToken } from "@/utils/auth";
 import { root1 } from "@/utils/request";
-import crudUser, { examineCase, getCaseDetail } from "@/api/case";
+import crudUser, {getActivityList} from "@/api/banner";
 import { mapState } from "vuex";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import CRUD, { presenter, header, form, crud } from "@crud/crud";
@@ -106,19 +127,18 @@ import rrOperation from "@crud/RR.operation";
 import crudOperation from "@crud/CRUD.operation";
 import udOperation from "@crud/UD.operation";
 const defaultForm = {
-  subject: null,
+  activityId: null,
+  activityName: null,
   coverImage: null,
-  activityStartTime: null,
-  activityEndTime: null,
-  detailDesc: null,
-  sort: null
+  httpPath: null,
+  routeType: null
 };
 export default {
   name: "",
   components: { crudOperation, rrOperation, pagination, udOperation },
   cruds() {
     return CRUD({
-      url: "/admin/classical/listByAdmin",
+      url: "/mini/banner/list",
       method: "post",
       crudMethod: { ...crudUser }
     });
@@ -127,12 +147,10 @@ export default {
   data() {
     return {
       rules: {
-        subject: [{ required: true, message: "请输入活动主题", trigger: "blur" }],
-        coverImage: [{ required: true, message: "请输入封面图片", trigger: "blur" }],
-        activityStartTime: [{ required: true, message: "请选择活动开始时间", trigger: "change" }],
-        activityEndTime: [{ required: true, message: "请选择活动结束时间", trigger: "change" }],
-        detailDesc: [{ required: true, message: "请输入详细描述", trigger: "blur" }],
-        sort: [{ required: true, message: "请输入排序", trigger: "blur" }]
+        coverImage: [{ required: true, message: "请输入banner图片", trigger: "blur" }],
+        httpPath: [{ required: true, message: "请输入跳转链接", trigger: "blur" }],
+        routeType: [{ required: true, message: "请选择跳转类型", trigger: "change" }],
+        activityId: [{ required: true, message: "请选择跳转活动", trigger: "change" }],
       },
       detailsDialog: false,
       detail: {},
@@ -146,7 +164,8 @@ export default {
       total: 0,
       uploadUrl: "",
       token: '',
-      fileList: []
+      fileList: [],
+      activityList: []
     };
   },
   computed: {},
@@ -154,8 +173,23 @@ export default {
     console.log(this.crud.data);
     this.uploadUrl = root1 + "/admin/upload/uploadVideo";
     this.token = getToken();
+    this.getActivityList()
   },
   methods: {
+    activeChange(e){
+      console.log(e)
+      this.activityList.forEach(item =>{
+        if(item.id == e) {
+          this.form.activityName = item.name
+        }
+      })
+    },
+    getActivityList(){
+      getActivityList().then(res =>{
+        this.activityList = res.dataList
+        console.log(res)
+      })
+    },
     handleSuccess(response, file, fileList) {
       if(response.code === 0) {
         this.form.coverImage = response.data.httpPath;
@@ -168,9 +202,30 @@ export default {
     handleRemove(file, fileList) {
       this.fileList = [];
       this.form.coverImage = '';
+      this.form.activityId = '';
     },
     [CRUD.HOOK.beforeToAdd](crud, form) {
       this.form.id = null;
+      this.fileList = [];
+    },
+    [CRUD.HOOK.beforeSubmit](crud, form) {
+      if(this.form.routeType == 1){
+        this.form.httpPath = null
+      }
+      if(this.form.routeType == 2){
+        this.form.activityId = null
+        this.form.activityName = null
+      }
+    },
+    [CRUD.HOOK.beforeToEdit](crud, form) {
+      console.log(form, "form");
+      this.fileList = [
+        {
+          name: "封面图片",
+          url: form.coverImage
+        }
+      ];
+      // this.fileList = [];
     },
     toOpenDetail(data) {
       this.detailsDialog = true;

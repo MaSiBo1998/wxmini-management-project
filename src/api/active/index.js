@@ -7,6 +7,13 @@ export function examineActive(data) {
     data
   })
 }
+export function examineActor(data) {
+  return request1({
+    url: '/admin/registration/auditUser',
+    method: 'post',
+    data
+  })
+}
 export function getActiveDetail(data) {
   return request1({
     url: '/admin/activity/getOneByAdmin',
@@ -50,4 +57,4 @@ export function edit(data) {
 }
 
 
-export default { add, edit, del,examineActive,getActiveDetail }
+export default { add, edit, del,examineActive,getActiveDetail,examineActor }

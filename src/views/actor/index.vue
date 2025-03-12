@@ -17,11 +17,23 @@
     <el-dialog style="overflow: hidden" :visible.sync="detailsDialog" title="演员详情" width="580px" :loading="loading">
       <el-row :gutter="15" class="detail-row">
         <el-col :span="4" class="detail-label">
-          姓名
+          演员姓名
         </el-col>
         <el-col :span="8" class="detail-value">
           {{ detail.name }}
         </el-col>
+        <el-col :span="4" class="detail-label">
+          头像
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          <el-image
+            style="width: 70px; height: 70px"
+            :src="detail.homeImage ? detail.homeImage.split(',')[0] : ''"
+            :preview-src-list="detail.homeImage ? detail.homeImage.split(',') : []"
+          />
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
         <el-col :span="4" class="detail-label">
           代表图
         </el-col>
@@ -32,6 +44,13 @@
             :preview-src-list="detail.coverImage ? detail.coverImage.split(',') : []"
           />
         </el-col>
+        <el-col :span="4" class="detail-label">
+          视频
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          <a :href="detail.videoClipUrl" target="_blank">查看视频</a>
+        </el-col>
+
       </el-row>
       <el-row :gutter="15" class="detail-row">
         <el-col :span="4" class="detail-label">
@@ -60,7 +79,7 @@
         </el-col>
       </el-row>
       <el-row :gutter="15" class="detail-row">
-        
+
         <el-col :span="4" class="detail-label">
           特长2
         </el-col>
@@ -101,6 +120,8 @@
         <el-col :span="8" class="detail-value">
           {{ detail.height }}
         </el-col>
+        </el-row>
+      <el-row :gutter="15" class="detail-row">
         <el-col :span="4" class="detail-label">
           体重
         </el-col>
@@ -121,12 +142,7 @@
         <el-col :span="8" class="detail-value">
           {{ detail.performanceCases }}
         </el-col>
-        <el-col :span="4" class="detail-label">
-          视频
-        </el-col>
-        <el-col :span="8" class="detail-value">
-          <a :href="detail.videoClipUrl" target="_blank">查看视频</a>
-        </el-col>
+
       </el-row>
     </el-dialog>
     <!--表格渲染-->

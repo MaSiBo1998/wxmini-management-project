@@ -140,16 +140,16 @@
         <el-table-column prop="userId" align="center" label="报名人姓名" width="120"> </el-table-column>
         <el-table-column prop="registrationStatus" align="center" label="报名状态" width="120">
           <template slot-scope="scope">
-            {{ scope.row.registrationStatus == 0 ? "未审核" : "已审核" }}
+            {{ scope.row.registrationStatus == 0 ?'已报名' : (scope.row.registrationStatus == 1 ?'已通过' : (scope.row.registrationStatus == 2 ?'已拒绝' :scope.row.registrationStatus == 0 ? "未审核" : "")) }}
           </template>
         </el-table-column>
         <el-table-column prop="registrationTime" align="center" label="报名时间" width="150"> </el-table-column>
         <el-table-column prop="remarks" align="center" label="操作" width="150">
           <template slot-scope="scope">
-            <el-button type="success" @click="pass(scope.row)">通过</el-button>
-            <el-button type="warning" @click="reject(scope.row)">拒绝</el-button>
+            <el-button type="success" @click="examineActor(scope.row,1)">通过</el-button>
+            <el-button type="warning" @click="examineActor(scope.row,2)">拒绝</el-button>
           </template>
-          
+
         </el-table-column>
       </el-table>
       <el-pagination
@@ -161,7 +161,7 @@
       />
     </el-dialog>
     <!-- 详情展示 -->
-    <el-dialog style="overflow: hidden" :visible.sync="detailsDialog" title="演员详情" width="580px" :loading="loading">
+    <el-dialog style="overflow: hidden" :visible.sync="detailsDialog" title="演员详情" width="750px" :loading="loading">
       <el-row :gutter="15" class="detail-row">
         <el-col :span="5" class="detail-label">
           封面图片
@@ -252,12 +252,7 @@
         </el-col>
       </el-row>
       <el-row :gutter="15" class="detail-row">
-        <el-col :span="5" class="detail-label">
-          详细描述
-        </el-col>
-        <el-col :span="7" class="detail-value">
-          {{ detail.detailDesc }}
-        </el-col>
+
         <el-col :span="5" class="detail-label">
           排序
         </el-col>
@@ -277,6 +272,16 @@
         </el-col>
         <el-col :span="7" class="detail-value">
           {{ detail.releaseTime }}
+        </el-col>
+
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          详细描述
+        </el-col>
+        <el-col :span="19" class="detail-value" >
+          <div v-html="detail.detailDesc"></div>
+          <!-- {{ detail.detailDesc }} -->
         </el-col>
       </el-row>
     </el-dialog>
@@ -340,7 +345,7 @@ import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 import { getToken } from "@/utils/auth";
 import { root1 } from "@/utils/request";
-import crudUser, { examineActive, getActiveDetail, getActiveActorList } from "@/api/active";
+import crudUser, { examineActive, getActiveDetail, getActiveActorList,examineActor} from "@/api/active";
 import { mapState } from "vuex";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import CRUD, { presenter, header, form, crud } from "@crud/crud";
@@ -452,8 +457,7 @@ export default {
         pageSize: this.pageSize,
         pageNum: this.currentPage
       };
-      getActiveActorList(params)
-        .then(res => {
+      getActiveActorList(params).then(res => {
           console.log(res, "报名人列表");
           this.tableData = res.dataList;
           this.tableLoading = false;
@@ -463,44 +467,20 @@ export default {
           this.tableLoading = false;
         });
     },
-    pass(row) {
-      this.$confirm("是否通过该用户报名?", "提示", {
+    examineActor(row,type) {
+      let str = type == 1?'是否通过该用户报名?':'是否拒绝该用户报名?'
+      this.$confirm(str, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
           let params = {
-            id: row.id,
-            registrationStatus: 1
+            userId: row.id,
+            registrationStatus: type,
+            activityId: this.activityId,
           };
-          examineActive(params).then(res => {
-            this.$message({
-              type: "success",
-              message: "操作成功!"
-            });
-            this.getActiveActorList(this.activityId);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消操作"
-          });
-        });
-    },
-    reject(row) {
-      this.$confirm("是否拒绝该用户报名?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          let params = {
-            id: row.id,
-            registrationStatus: 2
-          };
-          examineActive(params).then(res => {
+          examineActor(params).then(res => {
             this.$message({
               type: "success",
               message: "操作成功!"
@@ -599,4 +579,4 @@ export default {
 .detail-value a:hover {
   text-decoration: underline;
 }
-</styl>
+</style>
