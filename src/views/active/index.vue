@@ -187,7 +187,7 @@
       />
     </el-dialog>
     <!-- 详情展示 -->
-    <el-dialog style="overflow: hidden" :visible.sync="detailsDialog" title="演员详情" width="750px" :loading="loading">
+    <el-dialog append-to-body  :visible.sync="detailsDialog" title="演员详情" width="750px" :loading="loading">
       <el-row :gutter="15" class="detail-row">
         <el-col :span="5" class="detail-label">
           封面图片
