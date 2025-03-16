@@ -1,25 +1,51 @@
 <template>
   <div style="overflow-x: hidden;overflow-y: hidden;">
-    <div id="login" style="overflow-x: hidden;overflow-y: hidden;" :style="{ backgroundImage: 'url(' + Background + ')' }">
+    <div
+      id="login"
+      style="overflow-x: hidden;overflow-y: hidden;"
+      :style="{ backgroundImage: 'url(' + Background + ')' }"
+    >
       <div class="login" style="overflow-x: hidden;overflow-y: hidden;">
-        <el-form ref="loginForm" :model="loginForm" :rules="loginRules" label-position="left" label-width="0px"
-          class="login-form">
+        <el-form
+          ref="loginForm"
+          :model="loginForm"
+          :rules="loginRules"
+          label-position="left"
+          label-width="0px"
+          class="login-form"
+        >
           <h3 class="title">
             后台管理
           </h3>
           <el-form-item prop="loginAccount">
-            <el-input v-model="loginForm.loginAccount" type="text" auto-complete="off" placeholder="用户姓名" prefix-icon="el-icon-user">
-
+            <el-input
+              v-model="loginForm.loginAccount"
+              type="text"
+              auto-complete="off"
+              placeholder="用户姓名"
+              prefix-icon="el-icon-user"
+            >
             </el-input>
           </el-form-item>
           <el-form-item prop="loginPassword">
-            <el-input v-model="loginForm.loginPassword" type="loginPassword" auto-complete="off" placeholder="登录密码"
-              @keyup.enter.native="handleLogin" prefix-icon="el-icon-lock">
+            <el-input
+              v-model="loginForm.loginPassword"
+              type="loginPassword"
+              auto-complete="off"
+              placeholder="登录密码"
+              @keyup.enter.native="handleLogin"
+              prefix-icon="el-icon-lock"
+            >
             </el-input>
           </el-form-item>
           <el-form-item style="width:100%;">
-            <el-button :loading="loading" size="medium" type="primary" style="width:100%;"
-              @click.native.prevent="handleLogin">
+            <el-button
+              :loading="loading"
+              size="medium"
+              type="primary"
+              style="width:100%;"
+              @click.native.prevent="handleLogin"
+            >
               <span v-if="!loading">登录</span>
               <span v-else>登录中...</span>
             </el-button>
@@ -32,75 +58,80 @@
 
 <script>
 // import Bg from "@/components/Bg/index";
-import Cookies from 'js-cookie'
-import Background from '@/assets/images/bg.jpg'
-import {test} from '@/api/login.js'
+import Cookies from "js-cookie";
+import Background from "@/assets/images/bg.jpg";
+import { test } from "@/api/login.js";
 export default {
-  name: 'Login',
+  name: "Login",
   // components: { Bg },
   data() {
     return {
       Background: Background,
-      codeUrl: '',
-      cookiePass: '',
+      codeUrl: "",
+      cookiePass: "",
       loginForm: {
-        loginAccount: '',
-        loginPassword: ''
+        loginAccount: "",
+        loginPassword: ""
       },
       loginRules: {
-        loginAccount: [{ required: true, trigger: 'blur', message: '用户名不能为空' }],
-        loginPassword: [{ required: true, trigger: 'blur', message: '密码不能为空' }]
+        loginAccount: [{ required: true, trigger: "blur", message: "用户名不能为空" }],
+        loginPassword: [{ required: true, trigger: "blur", message: "密码不能为空" }]
       },
       loading: false,
-      redirect: undefined,
-    }
+      redirect: undefined
+    };
   },
   watch: {
     $route: {
-      handler: function (route) {
-        this.redirect = route.query && route.query.redirect
+      handler: function(route) {
+        this.redirect = route.query && route.query.redirect;
       },
       immediate: true
     }
   },
   created() {
-    this.getCookie()
+    this.getCookie();
   },
   methods: {
     getCookie() {
-      const loginAccount = Cookies.get('loginAccount')
-      let loginPassword = Cookies.get('loginPassword')
-      this.cookiePass = loginPassword === undefined ? '' : loginPassword
-      loginPassword = loginPassword === undefined ? this.loginForm.loginPassword : loginPassword
+      const loginAccount = Cookies.get("loginAccount");
+      let loginPassword = Cookies.get("loginPassword");
+      this.cookiePass = loginPassword === undefined ? "" : loginPassword;
+      loginPassword = loginPassword === undefined ? this.loginForm.loginPassword : loginPassword;
       this.loginForm = {
         loginAccount: loginAccount === undefined ? this.loginForm.loginAccount : loginAccount,
         loginPassword: loginPassword
-      }
+      };
     },
     handleLogin() {
-console.log('登录')
+      console.log("登录");
       this.$refs.loginForm.validate(valid => {
         const user = {
           loginAccount: this.loginForm.loginAccount,
           loginPassword: this.loginForm.loginPassword
-        }
+        };
+        let _this = this
         if (valid) {
-      console.log('登录1')
-          this.loading = true
-          this.$store.dispatch('Login', user).then((res) => {
-            this.loading = false
-            this.$router.push({ path: '/' })
-          }).catch((err) => {
-            console.log(err)
-            this.loading = false
-          })
+          console.log("登录1");
+          this.loading = true;
+          this.$store
+            .dispatch("Login", user)
+            .then(res => {
+              localStorage.setItem('user_name',_this.loginForm.loginAccount)
+              this.loading = false;
+              this.$router.push({ path: "/" });
+            })
+            .catch(err => {
+              console.log(err);
+              this.loading = false;
+            });
         } else {
-          return false
+          return false;
         }
-      })
+      });
     }
   }
-}
+};
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
@@ -129,7 +160,7 @@ console.log('登录')
 .title {
   margin: 0 auto 15px;
   text-align: center;
-  color: #EBEEF5;
+  color: #ebeef5;
 
   img {
     width: 60px;
@@ -153,8 +184,6 @@ console.log('登录')
 .select-app {
   display: flex;
   align-content: center !important;
-  ;
-
   .app-name {
     display: block;
     color: #8492a6;
@@ -217,7 +246,7 @@ console.log('登录')
 
   img {
     cursor: pointer;
-    vertical-align: middle
+    vertical-align: middle;
   }
 }
 

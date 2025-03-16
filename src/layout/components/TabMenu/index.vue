@@ -42,7 +42,7 @@
     <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           <el-avatar size="small" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>
-          <span class="usname">{{ ` ${user.userInfo || '未知'}` }}</span>
+          <span class="usname">{{ ` ${userName || '未知'}` }}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -97,6 +97,7 @@ export default {
       }
     }
     return {
+      userName: '',
       activeIndex2: '2',
       loading: false,
       dialog: false,
@@ -126,6 +127,7 @@ export default {
     ]),
   },
   created() {
+    this.userName = localStorage.getItem('user_name')
     console.log(this.user,123)
   },
   methods: {
