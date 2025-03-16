@@ -84,7 +84,8 @@
           />
         </el-form-item>
         <el-form-item label="详细描述" prop="detailDesc">
-          <quill-editor v-model="form.detailDesc" ref="myQuillEditor"></quill-editor>
+          <el-input :maxlength="75" :rows="3" v-model="form.detailDesc" show-word-limit placeholder="封面图片" style="width: 560px" type="textarea" resize="none" />
+          <!-- <quill-editor v-model="form.detailDesc" ref="myQuillEditor"></quill-editor> -->
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -148,7 +149,10 @@
           详细描述
         </el-col>
         <el-col :span="7" class="detail-value">
-          <div v-html="detail.detailDesc"></div>
+          <el-col :span="7" class="detail-value">
+          {{ detail.detailDesc }}
+        </el-col>
+          <!-- <div v-html="detail.detailDesc"></div> -->
         </el-col>
       </el-row>
     </el-dialog>

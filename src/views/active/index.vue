@@ -31,6 +31,7 @@
     <!--表单渲染 :rules="rules"-->
     <el-dialog
       append-to-body
+      v-if="crud.status.cu > 0"
       :close-on-click-modal="false"
       :before-close="crud.cancelCU"
       :visible.sync="crud.status.cu > 0"
@@ -43,6 +44,9 @@
         </el-form-item>
         <el-form-item label="活动主题" prop="subject">
           <el-input v-model="form.subject" placeholder="活动主题" style="width: 560px" />
+        </el-form-item>
+        <el-form-item label="排序" prop="sort">
+          <el-input v-model="form.sort" placeholder="排序" style="width: 560px" />
         </el-form-item>
         <el-form-item label="选择图片上传">
           <el-upload
@@ -105,17 +109,26 @@
           <el-input v-model="form.requiredFemaleNumber" placeholder="需要的女性人数" style="width: 560px" />
         </el-form-item>
         <el-form-item label="节目要求" prop="programRequirements">
-          <el-input v-model="form.programRequirements" placeholder="节目要求" style="width: 560px" />
+          <el-checkbox-group v-model="form.programRequirements">
+            <el-checkbox label="需自备完整节目"></el-checkbox>
+            <el-checkbox label="参与集体编排"></el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="其他要求描述" prop="otherRequirementsDesc">
-          <el-input v-model="form.otherRequirementsDesc" placeholder="其他要求描述" style="width: 560px" />
+        <el-form-item label="其他要求" prop="otherRequirementsType">
+          <el-checkbox-group v-model="form.otherRequirementsType">
+            <el-checkbox label="需参加定期排练"></el-checkbox>
+            <el-checkbox label="需自备演出服装"></el-checkbox>
+            <el-checkbox label="需自备专业鞋具"></el-checkbox>
+            <el-checkbox label="需携带表演设备"></el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="其他特殊要求" prop="otherRequirementsDesc">
+          <el-input v-model="form.otherRequirementsDesc" placeholder="其他特殊要求" style="width: 560px" />
         </el-form-item>
         <el-form-item label="详细描述" prop="detailDesc">
           <quill-editor v-model="form.detailDesc" ref="myQuillEditor"></quill-editor>
         </el-form-item>
-        <el-form-item label="排序" prop="sort">
-          <el-input v-model="form.sort" placeholder="排序" style="width: 560px" />
-        </el-form-item>
+
         <!-- <el-form-item label="发布状态" prop="releaseState">
           <el-input v-model="form.releaseState" placeholder="发布状态" style="width: 560px" />
         </el-form-item>
@@ -137,19 +150,32 @@
       :loading="tableLoading"
     >
       <el-table ref="table" v-loading="tableLoading" max-height="600" stripe lazy :data="tableData">
-        <el-table-column prop="userId" align="center" label="报名人姓名" width="120"> </el-table-column>
+        <el-table-column prop="name" align="center" label="报名人姓名" width="120">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="toOpenActorDetail(scope.row)">{{ scope.row.name }}</el-button>
+        </template>
+        </el-table-column>
         <el-table-column prop="registrationStatus" align="center" label="报名状态" width="120">
           <template slot-scope="scope">
-            {{ scope.row.registrationStatus == 0 ?'已报名' : (scope.row.registrationStatus == 1 ?'已通过' : (scope.row.registrationStatus == 2 ?'已拒绝' :scope.row.registrationStatus == 0 ? "未审核" : "")) }}
+            {{
+              scope.row.registrationStatus == 0
+                ? "已报名"
+                : scope.row.registrationStatus == 1
+                ? "已通过"
+                : scope.row.registrationStatus == 2
+                ? "已拒绝"
+                : scope.row.registrationStatus == 0
+                ? "未审核"
+                : ""
+            }}
           </template>
         </el-table-column>
         <el-table-column prop="registrationTime" align="center" label="报名时间" width="150"> </el-table-column>
         <el-table-column prop="remarks" align="center" label="操作" width="150">
           <template slot-scope="scope">
-            <el-button type="success" @click="examineActor(scope.row,1)">通过</el-button>
-            <el-button type="warning" @click="examineActor(scope.row,2)">拒绝</el-button>
+            <el-button type="success" @click="examineActor(scope.row, 1)">通过</el-button>
+            <el-button type="warning" @click="examineActor(scope.row, 2)">拒绝</el-button>
           </template>
-
         </el-table-column>
       </el-table>
       <el-pagination
@@ -245,14 +271,19 @@
           {{ detail.programRequirements }}
         </el-col>
         <el-col :span="5" class="detail-label">
-          其他要求描述
+          其他要求
+        </el-col>
+        <el-col :span="7" class="detail-value">
+          {{ detail.otherRequirementsType }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="5" class="detail-label">
+          其他特殊要求
         </el-col>
         <el-col :span="7" class="detail-value">
           {{ detail.otherRequirementsDesc }}
         </el-col>
-      </el-row>
-      <el-row :gutter="15" class="detail-row">
-
         <el-col :span="5" class="detail-label">
           排序
         </el-col>
@@ -273,16 +304,147 @@
         <el-col :span="7" class="detail-value">
           {{ detail.releaseTime }}
         </el-col>
-
       </el-row>
       <el-row :gutter="15" class="detail-row">
         <el-col :span="5" class="detail-label">
           详细描述
         </el-col>
-        <el-col :span="19" class="detail-value" >
-          <div v-html="detail.detailDesc"></div>
+        <el-col :span="19" class="detail-value">
+          <div v-html="detail.detailDesc" style="height:200px;overflow-y: scroll;"></div>
           <!-- {{ detail.detailDesc }} -->
         </el-col>
+      </el-row>
+    </el-dialog>
+    <!-- 演员详情展示 -->
+    <el-dialog style="overflow: hidden" :visible.sync="actordetailsDialog" title="演员详情" width="580px" :loading="loading">
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          演员姓名
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.name }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          头像
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          <el-image
+            style="width: 70px; height: 70px"
+            :src="detail.homeImage ? detail.homeImage.split(',')[0] : ''"
+            :preview-src-list="detail.homeImage ? detail.homeImage.split(',') : []"
+          />
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          代表图
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          <el-image
+            style="width: 70px; height: 70px"
+            :src="detail.coverImage ? detail.coverImage.split(',')[0] : ''"
+            :preview-src-list="detail.coverImage ? detail.coverImage.split(',') : []"
+          />
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          视频
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          <a :href="detail.videoClipUrl" target="_blank">查看视频</a>
+        </el-col>
+
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          年龄
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.age }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          性别
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.gender == 1 ? "男" : "女" }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          电话
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.phoneNumber }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          特长1
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.primarySkillCategory }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+
+        <el-col :span="4" class="detail-label">
+          特长2
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.secondarySkillCategory }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          特长3
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.thirdlySkillCategory }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          其他特长
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.otherProfessionalCategory }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          毕业学校
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.graduationSchool }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          工作年限
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.workingYears }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          身高
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.height }}
+        </el-col>
+        </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          体重
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.weight }}
+        </el-col>
+        <el-col :span="4" class="detail-label">
+          过往经历
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.pastExperiences }}
+        </el-col>
+      </el-row>
+      <el-row :gutter="15" class="detail-row">
+        <el-col :span="4" class="detail-label">
+          演出案例
+        </el-col>
+        <el-col :span="8" class="detail-value">
+          {{ detail.performanceCases }}
+        </el-col>
+
       </el-row>
     </el-dialog>
     <!--表格渲染-->
@@ -290,6 +452,7 @@
       <el-table ref="table" v-loading="crud.loading" max-height="600" stripe lazy :data="crud.data">
         <el-table-column prop="name" align="center" label="活动名称" width="90" fixed> </el-table-column>
         <el-table-column prop="subject" align="center" label="活动主题" width="120"> </el-table-column>
+        <el-table-column prop="sort" align="center" label="活动排序" width="120"> </el-table-column>
         <el-table-column prop="coverImage" align="center" label="封面图片" width="120">
           <template slot-scope="scope">
             <el-image
@@ -338,14 +501,14 @@
 
 <script>
 // require styles
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
-
-import { quillEditor } from 'vue-quill-editor'
+import "quill/dist/quill.core.css";
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
+import {  getActorDetail } from "@/api/actor/index";
+import { quillEditor } from "vue-quill-editor";
 import { getToken } from "@/utils/auth";
 import { root1 } from "@/utils/request";
-import crudUser, { examineActive, getActiveDetail, getActiveActorList,examineActor} from "@/api/active";
+import crudUser, { examineActive, getActiveDetail, getActiveActorList, examineActor } from "@/api/active";
 import { mapState } from "vuex";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import CRUD, { presenter, header, form, crud } from "@crud/crud";
@@ -365,6 +528,7 @@ const defaultForm = {
   requiredMaleNumber: null,
   requiredFemaleNumber: null,
   programRequirements: null,
+  otherRequirementsType: null,
   otherRequirementsDesc: null,
   detailDesc: null,
   sort: null
@@ -373,7 +537,7 @@ const defaultForm = {
 };
 export default {
   name: "",
-  components: { crudOperation, rrOperation, pagination, udOperation,quillEditor },
+  components: { crudOperation, rrOperation, pagination, udOperation, quillEditor },
   cruds() {
     return CRUD({
       url: "/admin/activity/list",
@@ -397,6 +561,8 @@ export default {
         requiredFemaleNumber: [{ required: true, message: "请输入需要的女性人数", trigger: "blur" }]
       },
       detailsDialog: false,
+      actordetailsDialog: false,
+      actorDetail:{},
       detail: {},
       loading: false,
       tableLoading: false,
@@ -407,7 +573,7 @@ export default {
       activityId: "",
       total: 0,
       uploadUrl: "",
-      token: '',
+      token: "",
       fileList: []
     };
   },
@@ -418,22 +584,48 @@ export default {
     this.token = getToken();
   },
   methods: {
+    toOpenActorDetail(data) {
+      this.actordetailsDialog = true;
+      let params = {
+        userId: data.userId
+      };
+      this.loading = true;
+      getActorDetail(params)
+        .then(res => {
+          console.log(res, "详情");
+          this.detail = res;
+          this.loading = false;
+        })
+        .catch(err => {
+          this.loading = false;
+        });
+    },
     handleSuccess(response, file, fileList) {
-      if(response.code === 0) {
+      if (response.code === 0) {
         this.form.coverImage = response.data.httpPath;
         this.fileList[0].url = response.data.httpPath;
-      }else{
-        this.form.coverImage = '';
-        this.fileList = []
+      } else {
+        this.form.coverImage = "";
+        this.fileList = [];
       }
     },
     handleRemove(file, fileList) {
       this.fileList = [];
-      this.form.coverImage = '';
+      this.form.coverImage = "";
     },
     [CRUD.HOOK.beforeToAdd](crud, form) {
       this.form.id = null;
       this.fileList = [];
+      this.form.programRequirements = []
+      this.form.otherRequirementsType = []
+    },
+    [CRUD.HOOK.afterCrudAddCancel](crud, form) {
+      this.form.programRequirements = null
+      this.form.otherRequirementsType = null
+    },
+    [CRUD.HOOK.afterCrudEditCancel](crud, form) {
+      this.form.programRequirements = null
+      this.form.otherRequirementsType = null
     },
     [CRUD.HOOK.beforeToEdit](crud, form) {
       console.log(form, "form");
@@ -443,12 +635,22 @@ export default {
           url: form.coverImage
         }
       ];
+      this.form.programRequirements = this.form.programRequirements.split(',')
+      this.form.otherRequirementsType = this.form.otherRequirementsType.split(',')
+      // this.fileList = [];
+    },
+    [CRUD.HOOK.beforeSubmit](crud, form) {
+      this.form.programRequirements = this.form.programRequirements.join(',')
+      this.form.otherRequirementsType = this.form.otherRequirementsType.join(',')
       // this.fileList = [];
     },
     openActorList(row) {
       this.activityId = row.id;
       this.tableDialog = true;
       this.getActiveActorList(this.activityId);
+    },
+    goCaseDetails(row){
+
     },
     getActiveActorList(activityId) {
       this.tableLoading = true;
@@ -457,7 +659,8 @@ export default {
         pageSize: this.pageSize,
         pageNum: this.currentPage
       };
-      getActiveActorList(params).then(res => {
+      getActiveActorList(params)
+        .then(res => {
           console.log(res, "报名人列表");
           this.tableData = res.dataList;
           this.tableLoading = false;
@@ -467,8 +670,8 @@ export default {
           this.tableLoading = false;
         });
     },
-    examineActor(row,type) {
-      let str = type == 1?'是否通过该用户报名?':'是否拒绝该用户报名?'
+    examineActor(row, type) {
+      let str = type == 1 ? "是否通过该用户报名?" : "是否拒绝该用户报名?";
       this.$confirm(str, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -478,7 +681,7 @@ export default {
           let params = {
             userId: row.id,
             registrationStatus: type,
-            activityId: this.activityId,
+            activityId: this.activityId
           };
           examineActor(params).then(res => {
             this.$message({
