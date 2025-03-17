@@ -84,8 +84,7 @@
           />
         </el-form-item>
         <el-form-item label="详细描述" prop="detailDesc">
-          <el-input :maxlength="75" :rows="3" v-model="form.detailDesc" show-word-limit placeholder="封面图片" style="width: 560px" type="textarea" resize="none" />
-          <!-- <quill-editor v-model="form.detailDesc" ref="myQuillEditor"></quill-editor> -->
+          <quill-editor v-model="form.detailDesc" ref="myQuillEditor" :options="editorOption"></quill-editor>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -150,9 +149,9 @@
         </el-col>
         <el-col :span="7" class="detail-value">
           <el-col :span="7" class="detail-value">
-          {{ detail.detailDesc }}
+            <div v-html="detail.detailDesc"></div>
         </el-col>
-          <!-- <div v-html="detail.detailDesc"></div> -->
+
         </el-col>
       </el-row>
     </el-dialog>
@@ -199,8 +198,9 @@
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
-
-import { quillEditor } from 'vue-quill-editor'
+import { quillEditor, Quill } from "vue-quill-editor";
+import { container, ImageExtend, QuillWatch } from "quill-image-extend-module";
+Quill.register("modules/ImageExtend", ImageExtend); //注册扩展模块
 import { getToken } from "@/utils/auth";
 import { root1 } from "@/utils/request";
 import crudUser, { examineCase, getCaseDetail } from "@/api/case";
@@ -221,7 +221,7 @@ const defaultForm = {
 };
 export default {
   name: "",
-  components: { crudOperation, rrOperation, pagination, udOperation },
+  components: { crudOperation, rrOperation, pagination, udOperation,quillEditor },
   cruds() {
     return CRUD({
       url: "/admin/classical/listByAdmin",
@@ -252,13 +252,39 @@ export default {
       total: 0,
       uploadUrl: "",
       token: '',
-      fileList: []
+      fileList: [],
+      editorOption: {
+
+      }
     };
   },
   computed: {},
   created() {
     this.uploadUrl = root1 + "/admin/upload/uploadVideo";
     this.token = getToken();
+    this.editorOption = {
+        modules: {
+          ImageExtend: {
+            loading: true,
+            name: "file",
+            action: this.uploadUrl,
+            headers: (xhr) => {
+              xhr.setRequestHeader('token',this.token)
+            }, // 可选参数 设置请求头部
+            response: (res) => {
+              return res.data.httpPath;
+            },
+          },
+          toolbar: {
+            container: container,
+            handlers: {
+              image: function () {
+                QuillWatch.emit(this.quill.id);
+              },
+            },
+          },
+        },
+      }
   },
   methods: {
     handleSuccess(response, file, fileList) {
