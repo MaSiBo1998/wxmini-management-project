@@ -31,7 +31,6 @@
     <!--表单渲染 :rules="rules"-->
     <el-dialog
       append-to-body
-      v-if="crud.status.cu > 0"
       :close-on-click-modal="false"
       :before-close="crud.cancelCU"
       :visible.sync="crud.status.cu > 0"
@@ -42,8 +41,8 @@
         <el-form-item label="活动名称" prop="name">
           <el-input v-model="form.name" placeholder="活动名称" style="width: 560px" />
         </el-form-item>
-        <el-form-item label="活动主题" prop="subject">
-          <el-input v-model="form.subject" placeholder="活动主题" style="width: 560px" />
+        <el-form-item label="副标题" prop="subject">
+          <el-input v-model="form.subject" placeholder="副标题" style="width: 560px" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model="form.sort" placeholder="排序" style="width: 560px" />
@@ -126,7 +125,7 @@
           <el-input v-model="form.otherRequirementsDesc" placeholder="其他特殊要求" style="width: 560px" />
         </el-form-item>
         <el-form-item label="详细描述" prop="detailDesc">
-          <quill-editor v-model="form.detailDesc" ref="myQuillEditor"></quill-editor>
+          <quill-editor v-model="form.detailDesc" ref="myQuillEditor" :options="editorOption"></quill-editor>
         </el-form-item>
 
         <!-- <el-form-item label="发布状态" prop="releaseState">
@@ -150,10 +149,10 @@
       :loading="tableLoading"
     >
       <el-table ref="table" v-loading="tableLoading" max-height="600" stripe lazy :data="tableData">
-        <el-table-column prop="name" align="center" label="报名人姓名" width="120">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="toOpenActorDetail(scope.row)">{{ scope.row.name }}</el-button>
-        </template>
+        <el-table-column prop="userName" align="center" label="报名人姓名" width="120">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="toOpenActorDetail(scope.row)">{{ scope.row.userName }}</el-button>
+          </template>
         </el-table-column>
         <el-table-column prop="registrationStatus" align="center" label="报名状态" width="120">
           <template slot-scope="scope">
@@ -187,7 +186,7 @@
       />
     </el-dialog>
     <!-- 详情展示 -->
-    <el-dialog append-to-body  :visible.sync="detailsDialog" title="演员详情" width="750px" :loading="loading">
+    <el-dialog append-to-body :visible.sync="detailsDialog" title="演员详情" width="750px" :loading="loading">
       <el-row :gutter="15" class="detail-row">
         <el-col :span="5" class="detail-label">
           封面图片
@@ -316,7 +315,13 @@
       </el-row>
     </el-dialog>
     <!-- 演员详情展示 -->
-    <el-dialog style="overflow: hidden" :visible.sync="actordetailsDialog" title="演员详情" width="580px" :loading="loading">
+    <el-dialog
+      style="overflow: hidden"
+      :visible.sync="actordetailsDialog"
+      title="演员详情"
+      width="580px"
+      :loading="loading"
+    >
       <el-row :gutter="15" class="detail-row">
         <el-col :span="4" class="detail-label">
           演员姓名
@@ -352,7 +357,6 @@
         <el-col :span="8" class="detail-value">
           <a :href="detail.videoClipUrl" target="_blank">查看视频</a>
         </el-col>
-
       </el-row>
       <el-row :gutter="15" class="detail-row">
         <el-col :span="4" class="detail-label">
@@ -381,7 +385,6 @@
         </el-col>
       </el-row>
       <el-row :gutter="15" class="detail-row">
-
         <el-col :span="4" class="detail-label">
           特长2
         </el-col>
@@ -422,7 +425,7 @@
         <el-col :span="8" class="detail-value">
           {{ detail.height }}
         </el-col>
-        </el-row>
+      </el-row>
       <el-row :gutter="15" class="detail-row">
         <el-col :span="4" class="detail-label">
           体重
@@ -444,7 +447,6 @@
         <el-col :span="8" class="detail-value">
           {{ detail.performanceCases }}
         </el-col>
-
       </el-row>
     </el-dialog>
     <!--表格渲染-->
@@ -500,12 +502,13 @@
 </template>
 
 <script>
-// require styles
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
-import {  getActorDetail } from "@/api/actor/index";
-import { quillEditor } from "vue-quill-editor";
+import { quillEditor, Quill } from "vue-quill-editor";
+import { container, ImageExtend, QuillWatch } from "quill-image-extend-module";
+Quill.register("modules/ImageExtend", ImageExtend); //注册扩展模块
+import { getActorDetail } from "@/api/actor/index";
 import { getToken } from "@/utils/auth";
 import { root1 } from "@/utils/request";
 import crudUser, { examineActive, getActiveDetail, getActiveActorList, examineActor } from "@/api/active";
@@ -550,7 +553,7 @@ export default {
     return {
       rules: {
         name: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
-        subject: [{ required: true, message: "请输入活动主题", trigger: "blur" }],
+        subject: [{ required: false, message: "请输入活动主题", trigger: "blur" }],
         coverImage: [{ required: true, message: "请输入封面图片", trigger: "blur" }],
         activityStartTime: [{ required: true, message: "请选择活动开始时间", trigger: "change" }],
         activityEndTime: [{ required: true, message: "请选择活动结束时间", trigger: "change" }],
@@ -562,7 +565,7 @@ export default {
       },
       detailsDialog: false,
       actordetailsDialog: false,
-      actorDetail:{},
+      actorDetail: {},
       detail: {},
       loading: false,
       tableLoading: false,
@@ -574,7 +577,10 @@ export default {
       total: 0,
       uploadUrl: "",
       token: "",
-      fileList: []
+      fileList: [],
+      editorOption: {
+
+      }
     };
   },
   computed: {},
@@ -582,6 +588,31 @@ export default {
     console.log(this.crud.data);
     this.uploadUrl = root1 + "/admin/upload/uploadVideo";
     this.token = getToken();
+    this.editorOption = {
+        modules: {
+          ImageExtend: {
+            loading: true,
+            name: "file",
+            action: this.uploadUrl,
+            headers: (xhr) => {
+              xhr.setRequestHeader('token',this.token)
+            }, // 可选参数 设置请求头部
+            response: (res) => {
+              return res.data.httpPath;
+            },
+          },
+          toolbar: {
+            container: container,
+            handlers: {
+              image: function () {
+                QuillWatch.emit(this.quill.id);
+              },
+            },
+          },
+        },
+      }
+
+
   },
   methods: {
     toOpenActorDetail(data) {
@@ -616,16 +647,16 @@ export default {
     [CRUD.HOOK.beforeToAdd](crud, form) {
       this.form.id = null;
       this.fileList = [];
-      this.form.programRequirements = []
-      this.form.otherRequirementsType = []
+      this.form.programRequirements = [];
+      this.form.otherRequirementsType = [];
     },
     [CRUD.HOOK.afterCrudAddCancel](crud, form) {
-      this.form.programRequirements = null
-      this.form.otherRequirementsType = null
+      this.form.programRequirements = null;
+      this.form.otherRequirementsType = null;
     },
     [CRUD.HOOK.afterCrudEditCancel](crud, form) {
-      this.form.programRequirements = null
-      this.form.otherRequirementsType = null
+      this.form.programRequirements = null;
+      this.form.otherRequirementsType = null;
     },
     [CRUD.HOOK.beforeToEdit](crud, form) {
       console.log(form, "form");
@@ -635,13 +666,13 @@ export default {
           url: form.coverImage
         }
       ];
-      this.form.programRequirements = this.form.programRequirements.split(',')
-      this.form.otherRequirementsType = this.form.otherRequirementsType.split(',')
+      this.form.programRequirements = this.form.programRequirements.split(",");
+      this.form.otherRequirementsType = this.form.otherRequirementsType.split(",");
       // this.fileList = [];
     },
     [CRUD.HOOK.beforeSubmit](crud, form) {
-      this.form.programRequirements = this.form.programRequirements.join(',')
-      this.form.otherRequirementsType = this.form.otherRequirementsType.join(',')
+      this.form.programRequirements = this.form.programRequirements.join(",");
+      this.form.otherRequirementsType = this.form.otherRequirementsType.join(",");
       // this.fileList = [];
     },
     openActorList(row) {
@@ -649,9 +680,7 @@ export default {
       this.tableDialog = true;
       this.getActiveActorList(this.activityId);
     },
-    goCaseDetails(row){
-
-    },
+    goCaseDetails(row) {},
     getActiveActorList(activityId) {
       this.tableLoading = true;
       let params = {

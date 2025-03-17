@@ -1,3 +1,4 @@
+
 import Vue from 'vue'
 import Element from 'element-ui'
 import VCharts from 'v-charts'
@@ -8,6 +9,7 @@ Vue.use(VueClipboard)
 import App from './App'
 import store from './store'
 import router from './router/routers'
+
 import './router/index' // permission control
 // Vue.prototype.$router = router
 Vue.use(VueQuillEditor, /* { default global options } */)
