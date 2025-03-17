@@ -30,7 +30,7 @@
           <el-form-item prop="loginPassword">
             <el-input
               v-model="loginForm.loginPassword"
-              type="loginPassword"
+              type="password"
               auto-complete="off"
               placeholder="登录密码"
               @keyup.enter.native="handleLogin"
