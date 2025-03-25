@@ -172,8 +172,11 @@
         <el-table-column prop="registrationTime" align="center" label="报名时间" width="150"> </el-table-column>
         <el-table-column prop="remarks" align="center" label="操作" width="150">
           <template slot-scope="scope">
-            <el-button type="success" @click="examineActor(scope.row, 1)">通过</el-button>
-            <el-button type="warning" @click="examineActor(scope.row, 2)">拒绝</el-button>
+            <div  v-if="scope.row.registrationStatus != 1 && scope.row.registrationStatus != 2">
+              <el-button type="success" @click="examineActor(scope.row, 1)">通过</el-button>
+              <el-button type="warning" @click="examineActor(scope.row, 2)">拒绝</el-button>
+            </div>
+
           </template>
         </el-table-column>
       </el-table>
@@ -708,7 +711,7 @@ export default {
       })
         .then(() => {
           let params = {
-            userId: row.id,
+            userId: row.userId,
             registrationStatus: type,
             activityId: this.activityId
           };
