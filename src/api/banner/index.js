@@ -17,6 +17,17 @@ export function getActivityList() {
     }
   })
 }
+export function getCaseList() {
+  return request1({
+    url: '/admin/classical/listByAdmin',
+    method: 'post',
+    data:{
+      pageSize:1000,
+      pageNum:1,
+      caseType:'2'
+    }
+  })
+}
 
 export function del(ids) {
   console.log(ids)
@@ -39,4 +50,4 @@ export function edit(data) {
 }
 
 
-export default { add, edit, del,getActivityList }
+export default { add, edit, del,getActivityList,getCaseList }

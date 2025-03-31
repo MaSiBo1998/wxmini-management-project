@@ -23,7 +23,7 @@
       <el-menu-item index="/case">
         <template slot="title">
           <i class="el-icon-s-platform"></i>
-          <span>经典案例</span>
+          <span>案例与新闻</span>
         </template>
       </el-menu-item>
       <el-menu-item index="/user">

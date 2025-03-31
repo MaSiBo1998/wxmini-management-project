@@ -12,7 +12,10 @@ import router from './router/routers'
 
 import './router/index' // permission control
 // Vue.prototype.$router = router
-Vue.use(VueQuillEditor, /* { default global options } */)
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+Vue.use(VueQuillEditor)
 Vue.use(Element, {
   size: 'small'
 })

@@ -54,6 +54,7 @@
           >
             <el-option label="跳转活动" :value="'1'" />
             <el-option label="外部跳转" :value="'2'" />
+            <el-option label="跳转新闻" :value="'3'" />
           </el-select>
         </el-form-item>
         <el-form-item label="选择跳转活动" prop="activityId" v-if="form.routeType
@@ -71,8 +72,24 @@
 
           </el-select>
         </el-form-item>
+        
         <el-form-item label="跳转链接" prop="httpPath" v-if="form.routeType == 2">
           <el-input v-model="form.httpPath" placeholder="跳转链接" style="width: 360px" />
+        </el-form-item>
+        <el-form-item label="选择跳转新闻" prop="caseId" v-if="form.routeType
+         == 3">
+          <el-select
+            v-model="form.caseId"
+            size="small"
+            filterable
+            placeholder="请选择跳转新闻"
+            class="filter-item"
+            style="width: 360px"
+            @change="caseChange"
+          >
+            <el-option v-for="item,index in caseList" :key="index"  :label="item.subject" :value="item.id" />
+
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -118,7 +135,7 @@
 <script>
 import { getToken } from "@/utils/auth";
 import { root1 } from "@/utils/request";
-import crudUser, {getActivityList} from "@/api/banner";
+import crudUser, {getActivityList,getCaseList} from "@/api/banner";
 import { mapState } from "vuex";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import CRUD, { presenter, header, form, crud } from "@crud/crud";
@@ -131,7 +148,9 @@ const defaultForm = {
   activityName: null,
   coverImage: null,
   httpPath: null,
-  routeType: null
+  routeType: null,
+  caseId: null,
+  caseName: null,
 };
 export default {
   name: "",
@@ -151,6 +170,7 @@ export default {
         httpPath: [{ required: true, message: "请输入跳转链接", trigger: "blur" }],
         routeType: [{ required: true, message: "请选择跳转类型", trigger: "change" }],
         activityId: [{ required: true, message: "请选择跳转活动", trigger: "change" }],
+        caseId: [{ required: true, message: "请选择新闻", trigger: "change" }],
       },
       detailsDialog: false,
       detail: {},
@@ -165,7 +185,8 @@ export default {
       uploadUrl: "",
       token: '',
       fileList: [],
-      activityList: []
+      activityList: [],
+      caseList: [],
     };
   },
   computed: {},
@@ -174,6 +195,7 @@ export default {
     this.uploadUrl = root1 + "/admin/upload/uploadVideo";
     this.token = getToken();
     this.getActivityList()
+    this.getCaseList()
   },
   methods: {
     activeChange(e){
@@ -184,9 +206,23 @@ export default {
         }
       })
     },
+    caseChange(e){
+      console.log(e)
+      this.activityList.forEach(item =>{
+        if(item.id == e) {
+          this.form.caseName = item.name
+        }
+      })
+    },
     getActivityList(){
       getActivityList().then(res =>{
         this.activityList = res.dataList
+        console.log(res)
+      })
+    },
+    getCaseList(){
+      getCaseList().then(res =>{
+        this.caseList = res.dataList
         console.log(res)
       })
     },
