@@ -2,10 +2,19 @@
   <div class="app-container">
     <div style="font-size: 20px;font-weight: 600;">案例与新闻</div>
     <!--工具栏-->
-    <div class="head-container">
+    <div class="head-container" style="margin-top: 10px;">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-row :gutter="20">
+          <el-col :span="6">
+            <el-input v-model="query.keyword" clearable size="small" placeholder="关键字搜索" class="filter-item" />
+          </el-col>
+          <el-col :span="6">
+            <el-date-picker v-model="releaseTime" type="daterange" value-format="yyyy-MM-dd" range-separator=":"
+               size="small" class="date-item" style="width: 100%"
+              start-placeholder="发布开始时间"
+              end-placeholder="发布结束时间" />
+          </el-col>
           <!-- <el-col :span="6">
             <el-select
               v-model="query.releaseState"
@@ -41,8 +50,8 @@
         <el-form-item label="名称" prop="subject">
           <el-input v-model="form.subject" placeholder="名称" style="width: 560px" />
         </el-form-item>
-        
-        <el-form-item label="类型" prop="caseType" >
+
+        <el-form-item label="类型" prop="caseType">
           <el-select
             v-model="form.caseType"
             size="small"
@@ -50,12 +59,20 @@
             class="filter-item"
             style="width: 560px"
           >
-            <el-option label="案例" :value="'1'" />
-            <el-option label="新闻" :value="'2'" />
+            <el-option label="案例" :value="1" />
+            <el-option label="新闻" :value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="案例副标题" prop="caseTitle" v-if="form.caseType == 1">
-          <el-input :rows="3" maxlength="75" type="textarea" resize="none" v-model="form.caseTitle" placeholder="案例副标题" style="width: 560px" />
+          <el-input
+            :rows="3"
+            maxlength="75"
+            type="textarea"
+            resize="none"
+            v-model="form.caseTitle"
+            placeholder="案例副标题"
+            style="width: 560px"
+          />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input type="number" v-model="form.sort" placeholder="排序" style="width: 560px" />
@@ -110,9 +127,14 @@
     </el-dialog>
 
     <!-- 详情展示 -->
-    <el-dialog style="overflow: hidden" :visible.sync="detailsDialog" :title="detail.caseType == 1? '案例': '新闻'" width="580px" :loading="loading">
+    <el-dialog
+      style="overflow: hidden"
+      :visible.sync="detailsDialog"
+      :title="detail.caseType == 1 ? '案例' : '新闻'"
+      width="750px"
+      :loading="loading"
+    >
       <el-row :gutter="15" class="detail-row">
-        
         <el-col :span="5" class="detail-label">
           名称
         </el-col>
@@ -164,11 +186,8 @@
         <el-col :span="5" class="detail-label">
           详细描述
         </el-col>
-        <el-col :span="7" class="detail-value">
-          <el-col :span="7" class="detail-value">
-            <div v-html="detail.detailDesc"></div>
-        </el-col>
-
+        <el-col :span="19" class="detail-value">
+          <div v-html="detail.detailDesc" style="height:200px;overflow-y: scroll;"></div>
         </el-col>
       </el-row>
     </el-dialog>
@@ -176,10 +195,10 @@
     <div class="table-box">
       <el-table ref="table" v-loading="crud.loading" max-height="600" stripe lazy :data="crud.data">
         <el-table-column prop="subject" align="center" label="名称"> </el-table-column>
-        <el-table-column prop="subject" align="center" label="类型"> 
-            <template slot-scope="scope">
-              {{ scope.row.caseType == 1 ? "案例" : "新闻" }}
-            </template>
+        <el-table-column prop="subject" align="center" label="类型">
+          <template slot-scope="scope">
+            {{ scope.row.caseType == 1 ? "案例" : "新闻" }}
+          </template>
         </el-table-column>
         <el-table-column prop="coverImage" align="center" label="封面图片">
           <template slot-scope="scope">
@@ -199,6 +218,7 @@
             {{ scope.row.releaseState == 1 ? "已发布" : "未发布" }}
           </template>
         </el-table-column>
+        <el-table-column prop="releaseTime" align="center" label="发布时间" width="150"> </el-table-column>
         <el-table-column prop="addBy" align="center" label="创建人"> </el-table-column>
         <el-table-column prop="loanCount" align="center" label="操作" width="280" fixed="right">
           <template slot-scope="scope" align="center">
@@ -238,11 +258,11 @@ const defaultForm = {
   detailDesc: null,
   sort: null,
   caseType: null,
-  caseTitle: null,
+  caseTitle: null
 };
 export default {
   name: "",
-  components: { crudOperation, rrOperation, pagination, udOperation,quillEditor },
+  components: { crudOperation, rrOperation, pagination, udOperation, quillEditor },
   cruds() {
     return CRUD({
       url: "/admin/classical/listByAdmin",
@@ -274,11 +294,10 @@ export default {
       activityId: "",
       total: 0,
       uploadUrl: "",
-      token: '',
+      token: "",
       fileList: [],
-      editorOption: {
-
-      }
+      editorOption: {},
+      releaseTime:[]
     };
   },
   computed: {},
@@ -286,42 +305,54 @@ export default {
     this.uploadUrl = root1 + "/admin/upload/uploadVideo";
     this.token = getToken();
     this.editorOption = {
-        modules: {
-          ImageExtend: {
-            loading: true,
-            name: "file",
-            action: this.uploadUrl,
-            headers: (xhr) => {
-              xhr.setRequestHeader('token',this.token)
-            }, // 可选参数 设置请求头部
-            response: (res) => {
-              return res.data.httpPath;
-            },
-          },
-          toolbar: {
-            container: container,
-            handlers: {
-              image: function () {
-                QuillWatch.emit(this.quill.id);
-              },
-            },
-          },
+      modules: {
+        ImageExtend: {
+          loading: true,
+          name: "file",
+          action: this.uploadUrl,
+          headers: xhr => {
+            xhr.setRequestHeader("token", this.token);
+          }, // 可选参数 设置请求头部
+          response: res => {
+            return res.data.httpPath;
+          }
         },
+        toolbar: {
+          container: container,
+          handlers: {
+            image: function() {
+              QuillWatch.emit(this.quill.id);
+            }
+          }
+        }
       }
+    };
   },
   methods: {
+    [CRUD.HOOK.beforeReset](crud) {
+      this.releaseTime = []
+    },
+    [CRUD.HOOK.beforeRefresh](crud) {
+      if (this.releaseTime) {
+        crud.query.releaseTimeStartKey = this.releaseTime[0];
+        crud.query.releaseTimeEndKey = this.releaseTime[1];
+      } else {
+        crud.query.releaseTimeStartKey = undefined;
+        crud.query.releaseTimeEndKey = undefined;
+      }
+    },
     handleSuccess(response, file, fileList) {
-      if(response.code === 0) {
+      if (response.code === 0) {
         this.form.coverImage = response.data.httpPath;
         this.fileList[0].url = response.data.httpPath;
-      }else{
-        this.form.coverImage = '';
-        this.fileList = []
+      } else {
+        this.form.coverImage = "";
+        this.fileList = [];
       }
     },
     handleRemove(file, fileList) {
       this.fileList = [];
-      this.form.coverImage = '';
+      this.form.coverImage = "";
     },
     [CRUD.HOOK.beforeToAdd](crud, form) {
       this.form.id = null;
@@ -346,6 +377,7 @@ export default {
         .then(res => {
           console.log(res, "详情");
           this.detail = res;
+          this.detail.detailDesc = res.detailDesc.replace(/<img/g, '<img style="width:100%"').replace(/<p/g, '<p style="color:rgb(153, 153, 153);font-size:26rpx"')
           this.loading = false;
         })
         .catch(err => {

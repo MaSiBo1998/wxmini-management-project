@@ -9,7 +9,7 @@ export function examineCase(data) {
 }
 export function getCaseDetail(data) {
   return request1({
-    url: '/admin/preview/getOneByAdmin',
+    url: '/admin/classical/getOne',
     method: 'post',
     data
   })

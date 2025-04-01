@@ -2,11 +2,29 @@
   <div class="app-container">
     <!--工具栏-->
     <div style="font-size: 20px;font-weight: 600;">演员管理</div>
-    <div class="head-container">
+    <div class="head-container" style="margin-top: 10px;">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-row :gutter="20">
-          <el-col :span="24">
+          <el-col :span="6">
+            <el-input v-model="query.nameKey" clearable size="small" placeholder="演员名称" class="filter-item" />
+          </el-col>
+          <el-col :span="6">
+            <el-cascader
+              style="width: 100%;"
+              size="small"
+              placeholder="专业"
+              v-model="skillKey"
+              separator="-"
+              :props="{
+                value: 'label',
+                label: 'label'
+              }"
+              :options="options"
+              @change="handleChange"
+            ></el-cascader>
+          </el-col>
+          <el-col :span="12">
             <rrOperation />
           </el-col>
         </el-row>
@@ -50,7 +68,6 @@
         <el-col :span="8" class="detail-value">
           <a :href="detail.videoClipUrl" target="_blank">查看视频</a>
         </el-col>
-
       </el-row>
       <el-row :gutter="15" class="detail-row">
         <el-col :span="4" class="detail-label">
@@ -79,7 +96,6 @@
         </el-col>
       </el-row>
       <el-row :gutter="15" class="detail-row">
-
         <el-col :span="4" class="detail-label">
           特长2
         </el-col>
@@ -120,7 +136,7 @@
         <el-col :span="8" class="detail-value">
           {{ detail.height }}
         </el-col>
-        </el-row>
+      </el-row>
       <el-row :gutter="15" class="detail-row">
         <el-col :span="4" class="detail-label">
           体重
@@ -142,7 +158,6 @@
         <el-col :span="8" class="detail-value">
           {{ detail.performanceCases }}
         </el-col>
-
       </el-row>
     </el-dialog>
     <!--表格渲染-->
@@ -206,8 +221,8 @@
           </template>
         </el-table-column>
       </el-table>
-       <!--分页组件-->
-    <pagination />
+      <!--分页组件-->
+      <pagination />
     </div>
   </div>
 </template>
@@ -242,12 +257,210 @@ export default {
     return {
       detailsDialog: false,
       detail: {},
-      loading: false
+      loading: false,
+      options: [
+        {
+          label: "歌手类",
+          children: [
+            {
+              label: "音乐剧"
+            },
+            {
+              label: "通俗"
+            },
+            {
+              label: "美声"
+            },
+            {
+              label: "民歌"
+            },
+            {
+              label: "民族"
+            },
+            {
+              label: "流行"
+            },
+            {
+              label: "说唱"
+            }
+          ]
+        },
+        {
+          label: "乐队类",
+          children: [
+            {
+              label: "民乐"
+            },
+            {
+              label: "流行音乐"
+            },
+            {
+              label: "西洋古典"
+            }
+          ]
+        },
+        {
+          label: "舞蹈",
+          children: [
+            {
+              label: "民族舞"
+            },
+            {
+              label: "古典舞"
+            },
+            {
+              label: "芭蕾舞"
+            },
+            {
+              label: "爵士舞"
+            },
+            {
+              label: "现代舞"
+            },
+            {
+              label: "流行热舞"
+            }
+          ]
+        },
+        {
+          label: "非遗",
+          children: [
+            {
+              label: "国家级"
+            },
+            {
+              label: "省级"
+            },
+            {
+              label: "其他"
+            }
+          ]
+        },
+        {
+          label: "戏曲",
+          children: [
+            {
+              label: "西洋乐器"
+            },
+            {
+              label: "中国民乐"
+            }
+          ]
+        },
+        {
+          label: "特技/绝技绝活",
+          children: []
+        },
+        {
+          label: "杂技",
+          children: [
+            {
+              label: "高空"
+            },
+            {
+              label: "传统"
+            }
+          ]
+        },
+        {
+          label: "魔术",
+          children: [
+            {
+              label: "大型魔术"
+            },
+            {
+              label: "近景魔术"
+            },
+            {
+              label: "互动魔术"
+            }
+          ]
+        },
+        {
+          label: "武术",
+          children: [
+            {
+              label: "武术套路"
+            },
+            {
+              label: "拳"
+            },
+            {
+              label: "太极"
+            },
+            {
+              label: "剑"
+            },
+            {
+              label: "刀"
+            },
+            {
+              label: "棍"
+            },
+            {
+              label: "枪"
+            }
+          ]
+        },
+        {
+          label: "戏剧表演",
+          children: []
+        },
+        {
+          label: "舞美设计",
+          children: []
+        },
+        {
+          label: "灯光师",
+          children: [
+            {
+              label: "灯光设计"
+            },
+            {
+              label: "灯光技师"
+            }
+          ]
+        },
+        {
+          label: "音响师",
+          children: [
+            {
+              label: "音响设计"
+            },
+            {
+              label: "音响技师"
+            }
+          ]
+        },
+        {
+          label: "服装设计"
+        },
+        {
+          label: "服装管理"
+        },
+        {
+          label: "多媒体"
+        },
+        {
+          label: "场务"
+        },
+        {
+          label: "播音主持"
+        }
+      ],
+      skillKey:''
     };
   },
   computed: {},
   created() {},
   methods: {
+    handleChange(e) {
+      console.log(e);
+      // if (e.length == 2) {
+      //   this.query.skillKey = e[0] + "-" + e[1];
+      //   this.crud.toQuery()
+      // }
+    },
     toOpenDetail(data) {
       this.detailsDialog = true;
       let params = {
@@ -264,8 +477,17 @@ export default {
           this.loading = false;
         });
     },
-    [CRUD.HOOK.beforeReset](crud) {},
+    [CRUD.HOOK.beforeReset](crud) {
+      this.skillKey = ''
+    },
     [CRUD.HOOK.beforeRefresh](crud) {
+      if (this.skillKey) {
+        if (this.skillKey.length == 2) {
+          crud.query.skillKey = this.skillKey[0] + "-" + this.skillKey[1];
+        }else{
+          crud.query.skillKey = this.skillKey[0]
+        }
+      }
       if (this.query.createTime) {
         crud.query.dateStart = this.query.createTime[0];
         crud.query.dateEnd = this.query.createTime[1];

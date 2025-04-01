@@ -53,7 +53,7 @@
             style="width: 360px"
           >
             <el-option label="跳转活动" :value="'1'" />
-            <el-option label="外部跳转" :value="'2'" />
+            <!-- <el-option label="外部跳转" :value="'2'" /> -->
             <el-option label="跳转新闻" :value="'3'" />
           </el-select>
         </el-form-item>
@@ -72,7 +72,7 @@
 
           </el-select>
         </el-form-item>
-        
+
         <el-form-item label="跳转链接" prop="httpPath" v-if="form.routeType == 2">
           <el-input v-model="form.httpPath" placeholder="跳转链接" style="width: 360px" />
         </el-form-item>
@@ -113,12 +113,13 @@
 
         <template slot-scope="scope">
 
-            {{scope.row.routeType ==1? '跳转活动':'外部跳转'}}
+            {{scope.row.routeType ==1? '跳转活动':(scope.row.routeType ==2? '外部链接':'跳转新闻')}}
 
         </template>
         </el-table-column>
         <el-table-column prop="activityName" align="center" label="跳转活动名称" width="130"> </el-table-column>
-        <el-table-column prop="httpPath" align="center" label="跳转链接"> </el-table-column>
+        <el-table-column prop="caseName" align="center" label="跳转新闻名称" width="130"> </el-table-column>
+        <!-- <el-table-column prop="httpPath" align="center" label="跳转链接"> </el-table-column> -->
         <el-table-column prop="addBy" align="center" label="创建人"> </el-table-column>
         <el-table-column prop="loanCount" align="center" label="操作" width="280" fixed="right">
           <template slot-scope="scope" align="center">
@@ -208,11 +209,12 @@ export default {
     },
     caseChange(e){
       console.log(e)
-      this.activityList.forEach(item =>{
+      this.caseList.forEach(item =>{
         if(item.id == e) {
-          this.form.caseName = item.name
+          this.form.caseName = item.subject
         }
       })
+      console.log(this.form.caseName)
     },
     getActivityList(){
       getActivityList().then(res =>{
@@ -247,10 +249,19 @@ export default {
     [CRUD.HOOK.beforeSubmit](crud, form) {
       if(this.form.routeType == 1){
         this.form.httpPath = null
+        this.form.caseId = null
+        this.form.caseName = null
       }
       if(this.form.routeType == 2){
         this.form.activityId = null
         this.form.activityName = null
+        this.form.caseId = null
+        this.form.caseName = null
+      }
+      if(this.form.routeType == 3){
+        this.form.activityId = null
+        this.form.activityName = null
+        this.form.httpPath = null
       }
     },
     [CRUD.HOOK.beforeToEdit](crud, form) {

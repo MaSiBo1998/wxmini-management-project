@@ -2,10 +2,19 @@
   <div class="app-container">
     <div style="font-size: 20px;font-weight: 600;">招募管理</div>
     <!--工具栏-->
-    <div class="head-container">
+    <div class="head-container" style="margin-top: 10px;">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-row :gutter="20">
+          <el-col :span="6">
+            <el-input v-model="query.keyword" clearable size="small" placeholder="主题搜索" class="filter-item" />
+          </el-col>
+          <el-col :span="6">
+            <el-date-picker v-model="releaseTime" type="daterange" value-format="yyyy-MM-dd" range-separator=":"
+               size="small" class="date-item" style="width: 100%"
+              start-placeholder="发布开始时间"
+              end-placeholder="发布结束时间" />
+          </el-col>
           <el-col :span="6">
             <el-select
               v-model="query.releaseState"
@@ -21,7 +30,22 @@
               <el-option label="未发布" :value="0" />
             </el-select>
           </el-col>
-          <el-col :span="18">
+          <el-col :span="6">
+            <el-select
+              v-model="query.isRegistrationKey"
+              @change="crud.toQuery()"
+              clearable
+              size="small"
+              filterable
+              placeholder="是否有报名人"
+              class="filter-item"
+              style="width: 100%"
+            >
+              <el-option label="是" :value="1" />
+              <el-option label="否" :value="0" />
+            </el-select>
+          </el-col>
+          <el-col :span="24">
             <rrOperation />
           </el-col>
         </el-row>
@@ -580,7 +604,8 @@ export default {
       fileList: [],
       editorOption: {
 
-      }
+      },
+      releaseTime:[]
     };
   },
   computed: {},
@@ -615,6 +640,18 @@ export default {
 
   },
   methods: {
+    [CRUD.HOOK.beforeReset](crud) {
+      this.releaseTime = []
+    },
+    [CRUD.HOOK.beforeRefresh](crud) {
+      if (this.releaseTime) {
+        crud.query.releaseTimeStartKey = this.releaseTime[0];
+        crud.query.releaseTimeEndKey = this.releaseTime[1];
+      } else {
+        crud.query.releaseTimeStartKey = undefined;
+        crud.query.releaseTimeEndKey = undefined;
+      }
+    },
     toOpenActorDetail(data) {
       this.actordetailsDialog = true;
       let params = {

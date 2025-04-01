@@ -2,6 +2,12 @@
   <div class="nav-box">
     <el-menu router :default-active="$router.path" class="el-menu-demo" mode="horizontal"
       background-color="#333f88" text-color="#a8b0df" active-text-color="#ffffff">
+      <el-menu-item index="/home">
+        <template slot="title">
+          <i class="el-icon-s-platform"></i>
+          <span>企业简介</span>
+        </template>
+      </el-menu-item>
       <el-menu-item index="/actor">
         <template slot="title">
           <i class="el-icon-s-platform"></i>

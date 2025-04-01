@@ -24,7 +24,7 @@ export function getCaseList() {
     data:{
       pageSize:1000,
       pageNum:1,
-      caseType:'2'
+      caseType:2
     }
   })
 }

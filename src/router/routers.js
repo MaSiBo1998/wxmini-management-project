@@ -14,8 +14,14 @@ export const constantRouterMap = [
   {
     path: '/',
     component: Layout,
-    redirect: '/actor',
+    redirect: '/home',
     children: [
+      {
+        path: '/home',
+        name: 'home',
+        component: (resolve) => require(['@/views/home/index'], resolve),
+        hidden: true
+      },
       {
         path: '/actor',
         name: 'actor',
