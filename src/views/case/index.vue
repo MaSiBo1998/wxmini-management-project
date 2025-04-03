@@ -209,8 +209,8 @@
             />
           </template>
         </el-table-column>
-        <el-table-column prop="activityStartTime" align="center" label="活动开始时间"> </el-table-column>
-        <el-table-column prop="activityEndTime" align="center" label="活动结束时间"> </el-table-column>
+        <el-table-column prop="activityStartTime" align="center" label="活动开始时间" width="150"> </el-table-column>
+        <el-table-column prop="activityEndTime" align="center" label="活动结束时间" width="150"> </el-table-column>
         <!-- <el-table-column prop="detailDesc" align="center" label="详细描述" width="120"> </el-table-column> -->
         <el-table-column prop="sort" align="center" label="排序"> </el-table-column>
         <el-table-column prop="releaseState" align="center" label="发布状态">
@@ -277,11 +277,11 @@ export default {
         subject: [{ required: true, message: "请输入名称", trigger: "blur" }],
         caseTitle: [{ required: true, message: "请输入案例副标题", trigger: "blur" }],
         coverImage: [{ required: true, message: "请输入封面图片", trigger: "blur" }],
-        activityStartTime: [{ required: true, message: "请选择活动开始时间", trigger: "change" }],
+        activityStartTime: [{ required: false, message: "请选择活动开始时间", trigger: "change" }],
         caseType: [{ required: true, message: "请选择类型", trigger: "change" }],
-        activityEndTime: [{ required: true, message: "请选择活动结束时间", trigger: "change" }],
+        activityEndTime: [{ required: false, message: "请选择活动结束时间", trigger: "change" }],
         detailDesc: [{ required: true, message: "请输入详细描述", trigger: "blur" }],
-        sort: [{ required: true, message: "请输入排序", trigger: "blur" }]
+        sort: [{ required: false, message: "请输入排序", trigger: "blur" }]
       },
       detailsDialog: false,
       detail: {},

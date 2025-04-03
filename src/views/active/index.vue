@@ -577,7 +577,7 @@ export default {
     return {
       rules: {
         name: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
-        subject: [{ required: false, message: "请输入活动主题", trigger: "blur" }],
+        subject: [{ required: true, message: "请输入活动主题", trigger: "blur" }],
         coverImage: [{ required: true, message: "请输入封面图片", trigger: "blur" }],
         activityStartTime: [{ required: true, message: "请选择活动开始时间", trigger: "change" }],
         activityEndTime: [{ required: true, message: "请选择活动结束时间", trigger: "change" }],
